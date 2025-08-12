@@ -1,6 +1,9 @@
 import React from 'react';
 import './MJProjectDetail.css';
 
+
+// test 2025-08-13
+
 interface MJProjectDetailProps {
   project: any;
   onClose: () => void;

@@ -1,0 +1,77 @@
+/* MJ 프로젝트 테이블 - 최소 기본 스타일 */
+.mj-projects-table {
+  /* 기본 테이블 컨테이너 */
+}
+
+.mj-projects-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.mj-projects-table th {
+  /* 테이블 헤더 */
+}
+
+.mj-projects-table td {
+  /* 테이블 셀 */
+}
+
+.mj-projects-table tr:hover {
+  /* 행 호버 효과 */
+}
+
+/* 데이터 없음 메시지 */
+.no-data {
+  /* 데이터 없음 표시 */
+}
+
+/* 프로젝트 이미지 */
+.project-images {
+  /* 이미지 컨테이너 */
+}
+
+.project-thumbnail {
+  /* 썸네일 이미지 */
+}
+
+.no-image {
+  /* 이미지 없음 표시 */
+}
+
+.image-error {
+  /* 이미지 에러 표시 */
+}
+
+.hidden {
+  display: none;
+}
+
+/* 상태 텍스트 */
+.status-text {
+  /* 상태 텍스트 */
+}
+
+/* 상세보기 버튼 */
+.detail-btn {
+  /* 상세보기 버튼 */
+}
+
+.detail-btn:hover {
+  /* 버튼 호버 효과 */
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .mj-projects-table {
+    /* 모바일 대응 */
+  }
+  
+  .mj-projects-table th,
+  .mj-projects-table td {
+    /* 모바일 셀 스타일 */
+  }
+  
+  .project-thumbnail {
+    /* 모바일 썸네일 */
+  }
+} 

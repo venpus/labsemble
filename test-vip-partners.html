@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP 파트너스 테스트</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        button {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-right: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+        .delete-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        .delete-btn:hover {
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+        }
+        .partners-list {
+            margin-top: 2rem;
+        }
+        .partner-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fecaca;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        .success {
+            background: rgba(16, 185, 129, 0.2);
+            color: #bbf7d0;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💎 VIP 파트너스 테스트</h1>
+        
+        <div id="message"></div>
+        
+        <div class="form-group">
+            <label for="partnerName">파트너스 이름:</label>
+            <input type="text" id="partnerName" placeholder="파트너스 이름을 입력하세요">
+        </div>
+        
+        <button onclick="createPartner()">파트너스 생성</button>
+        <button onclick="loadPartners()">파트너스 목록 조회</button>
+        
+        <div class="partners-list">
+            <h2>파트너스 목록</h2>
+            <div id="partnersList"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5001';
+
+        function showMessage(message, type = 'success') {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="${type}">${message}</div>`;
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 3000);
+        }
+
+        async function createPartner() {
+            const name = document.getElementById('partnerName').value.trim();
+            if (!name) {
+                showMessage('파트너스 이름을 입력해주세요.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/vip-partners`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('파트너스가 성공적으로 생성되었습니다!');
+                    document.getElementById('partnerName').value = '';
+                    loadPartners();
+                } else {
+                    showMessage(`오류: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`네트워크 오류: ${error.message}`, 'error');
+            }
+        }
+
+        async function loadPartners() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/vip-partners`);
+                const data = await response.json();
+                
+                const partnersList = document.getElementById('partnersList');
+                
+                if (data.success) {
+                    if (data.partners.length === 0) {
+                        partnersList.innerHTML = '<p>등록된 파트너스가 없습니다.</p>';
+                    } else {
+                        partnersList.innerHTML = data.partners.map(partner => `
+                            <div class="partner-item">
+                                <span><strong>ID:</strong> ${partner.id} | <strong>이름:</strong> ${partner.name} | <strong>등록일:</strong> ${new Date(partner.created_at).toLocaleDateString('ko-KR')}</span>
+                                <div>
+                                    <button onclick="editPartner(${partner.id}, '${partner.name}')">수정</button>
+                                    <button class="delete-btn" onclick="deletePartner(${partner.id})">삭제</button>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                } else {
+                    showMessage(`오류: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`네트워크 오류: ${error.message}`, 'error');
+            }
+        }
+
+        async function editPartner(id, currentName) {
+            const newName = prompt('새로운 파트너스 이름을 입력하세요:', currentName);
+            if (newName && newName.trim() !== '') {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/vip-partners/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ name: newName.trim() })
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        showMessage('파트너스가 성공적으로 수정되었습니다!');
+                        loadPartners();
+                    } else {
+                        showMessage(`오류: ${data.error}`, 'error');
+                    }
+                } catch (error) {
+                    showMessage(`네트워크 오류: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function deletePartner(id) {
+            if (confirm('정말로 이 파트너스를 삭제하시겠습니까?')) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/vip-partners/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        showMessage('파트너스가 성공적으로 삭제되었습니다!');
+                        loadPartners();
+                    } else {
+                        showMessage(`오류: ${data.error}`, 'error');
+                    }
+                } catch (error) {
+                    showMessage(`네트워크 오류: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        // 페이지 로드 시 파트너스 목록 조회
+        window.onload = function() {
+            loadPartners();
+        };
+    </script>
+</body>
+</html> 

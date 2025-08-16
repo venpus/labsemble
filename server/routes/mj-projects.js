@@ -72,8 +72,8 @@ router.post('/', authenticateToken, upload.array('productImages', 5), async (req
 
     // 프로젝트 등록
     const [result] = await connection.execute(
-      `INSERT INTO mj_projects (user_id, product_name, quantity, reference_link, purchase_link, image_paths, status, project_code, payment_status, delivery_status, expected_shipping_date, created_at, updated_at) 
-       VALUES (?, ?, ?, ?, ?, ?, '요청접수', ?, NULL, NULL, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+      `INSERT INTO mj_projects (user_id, product_name, quantity, reference_link, purchase_link, image_paths, status, project_code, payment_status, delivery_status, expected_shipping_date, quotation_approval, created_at, updated_at) 
+       VALUES (?, ?, ?, ?, ?, ?, '요청접수', ?, NULL, NULL, ?, '승인 대기', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
       [userId, productName, quantity, referenceLink || null, purchaseLink || null, JSON.stringify(imagePaths), projectCode, expectedShippingDate || null]
     );
 
@@ -124,6 +124,7 @@ router.get('/', authenticateToken, async (req, res) => {
         mp.delivery_status,
         mp.expected_shipping_date,
         mp.project_code,
+        mp.quotation_approval,
         mp.created_at,
         mp.updated_at,
         u.username,
@@ -208,6 +209,35 @@ router.patch('/:id/status', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error('프로젝트 상태 변경 오류:', error);
     res.status(500).json({ error: '프로젝트 상태 변경에 실패했습니다.' });
+  }
+});
+
+// MJ 프로젝트 견적승인 상태 변경
+router.patch('/:id/quotation-approval', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { quotationApproval } = req.body;
+
+    if (!quotationApproval) {
+      return res.status(400).json({ error: '견적승인 상태가 필요합니다.' });
+    }
+
+    const connection = await pool.getConnection();
+    
+    await connection.execute(
+      'UPDATE mj_projects SET quotation_approval = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [quotationApproval, id]
+    );
+
+    connection.release();
+
+    res.json({
+      success: true,
+      message: '견적승인 상태가 성공적으로 변경되었습니다.'
+    });
+  } catch (error) {
+    console.error('견적승인 상태 변경 오류:', error);
+    res.status(500).json({ error: '견적승인 상태 변경에 실패했습니다.' });
   }
 });
 

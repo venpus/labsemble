@@ -16,6 +16,7 @@ interface MJProject {
   invoice_status?: 'not_issued' | 'issued';
   expected_shipping_date?: string;
   project_code?: string;
+  quotation_approval?: string;
   created_at: string;
   updated_at: string;
   username?: string;
@@ -82,6 +83,32 @@ const MJProjectDetail: React.FC<MJProjectDetailProps> = ({ project, onClose, onE
       alert('구매링크 저장 중 오류가 발생했습니다.');
     } finally {
       setSavingLink(false);
+    }
+  };
+
+  const handleQuotationApprovalChange = async (newApproval: string) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5001/api/mj-projects/${project.id}/quotation-approval`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ quotationApproval: newApproval })
+      });
+
+      if (response.ok) {
+        // 성공적으로 변경된 경우 프로젝트 객체 업데이트
+        project.quotation_approval = newApproval;
+        alert('견적승인 상태가 성공적으로 변경되었습니다.');
+      } else {
+        const errorData = await response.json();
+        alert(`견적승인 상태 변경에 실패했습니다: ${errorData.error || '알 수 없는 오류'}`);
+      }
+    } catch (error) {
+      console.error('견적승인 상태 변경 오류:', error);
+      alert('견적승인 상태 변경 중 오류가 발생했습니다.');
     }
   };
 
@@ -313,28 +340,47 @@ const MJProjectDetail: React.FC<MJProjectDetailProps> = ({ project, onClose, onE
           </div>
         </div>
 
-        <div className="detail-section">
+        <div className="detail-section payment-section">
           <h3>💰 결제상태</h3>
-          <div className="payment-info-row">
-            <div className="payment-item">
-              <span className="payment-label">구매원가:</span>
-              <span className="payment-value">¥0</span>
+          <div className="payment-grid">
+            {/* 첫 번째 줄: 기본 결제 정보 */}
+            <div className="payment-row">
+              <div className="info-item">
+                <span className="info-label">구매원가:</span>
+                <span className="info-value">¥0</span>
+              </div>
+              <div className="info-item">
+                <span className="info-label">중국내 배송비:</span>
+                <span className="info-value">¥0</span>
+              </div>
+              <div className="info-item">
+                <span className="info-label">수수료율:</span>
+                <span className="info-value">0%</span>
+              </div>
+              <div className="info-item">
+                <span className="info-label">수수료:</span>
+                <span className="info-value">¥0</span>
+              </div>
             </div>
-            <div className="payment-item">
-              <span className="payment-label">중국내 배송비:</span>
-              <span className="payment-value">¥0</span>
-            </div>
-            <div className="payment-item">
-              <span className="payment-label">수수료율:</span>
-              <span className="payment-value">0%</span>
-            </div>
-            <div className="payment-item">
-              <span className="payment-label">수수료:</span>
-              <span className="payment-value">¥0</span>
-            </div>
-            <div className="payment-item total">
-              <span className="payment-label">총 결제 금액:</span>
-              <span className="payment-value">¥0</span>
+            
+            {/* 두 번째 줄: 총 결제 금액과 견적승인 */}
+            <div className="payment-row">
+              <div className="info-item total-payment">
+                <span className="info-label">총 결제 금액:</span>
+                <span className="info-value">¥0</span>
+              </div>
+              <div className="info-item quotation-approval">
+                <span className="info-label">견적승인:</span>
+                <select 
+                  value={project.quotation_approval || '승인 대기'} 
+                  onChange={(e) => handleQuotationApprovalChange(e.target.value)}
+                  className="quotation-select"
+                >
+                  <option value="승인 대기">승인 대기</option>
+                  <option value="승인됨">승인됨</option>
+                  <option value="거절됨">거절됨</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>

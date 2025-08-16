@@ -59,13 +59,11 @@ function App() {
             setCurrentUser(response.data.user);
             localStorage.setItem('user', JSON.stringify(response.data.user));
           })
-          .catch(error => {
-            console.error('토큰 검증 실패:', error);
-            // 토큰이 유효하지 않으면 로그아웃
-            handleLogout();
-          });
+                  .catch(error => {
+          // 토큰이 유효하지 않으면 로그아웃
+          handleLogout();
+        });
       } catch (error) {
-        console.error('저장된 사용자 정보 파싱 실패:', error);
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         localStorage.removeItem('showAdmin');

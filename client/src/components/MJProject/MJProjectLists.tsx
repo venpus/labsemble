@@ -62,24 +62,24 @@ const MJProjectLists: React.FC<MJProjectListsProps> = ({ mjProjects, isAdmin = f
   };
 
   const getImageUrl = (imagePath: string) => {
-    console.log('이미지 경로 처리:', { originalPath: imagePath });
+    
     
     // 이미지 경로가 이미 전체 URL인 경우
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-      console.log('전체 URL 사용:', imagePath);
+      
       return imagePath;
     }
     
     // 이미지 경로가 상대 경로인 경우
     if (imagePath.startsWith('/')) {
       const fullUrl = `http://localhost:5001${imagePath}`;
-      console.log('상대 경로 변환:', fullUrl);
+      
       return fullUrl;
     }
     
     // 이미지 경로가 파일명만 있는 경우
     const fullUrl = `http://localhost:5001/uploads/mj-projects/${imagePath}`;
-    console.log('파일명 기반 URL 생성:', fullUrl);
+    
     return fullUrl;
   };
 

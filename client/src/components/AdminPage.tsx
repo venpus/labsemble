@@ -96,7 +96,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ currentUser }) => {
           const userPartnersRes = await apiService.getUserPartners(user.id);
           userPartnersData[user.id] = userPartnersRes.data.partners || [];
         } catch (err) {
-          console.error(`사용자 ${user.id}의 파트너스 정보 로드 실패:`, err);
           userPartnersData[user.id] = [];
         }
       }
@@ -143,7 +142,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ currentUser }) => {
         setSmtProjects(projects);
       }
     } catch (err) {
-      console.error('SMT 프로젝트 로드 오류:', err);
       setSmtProjects([]);
     }
   };
@@ -163,7 +161,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ currentUser }) => {
         setArtworkProjects(projects);
       }
     } catch (err) {
-      console.error('아트웍 프로젝트 로드 오류:', err);
       setArtworkProjects([]);
     }
   };
@@ -183,7 +180,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ currentUser }) => {
         setMoldProjects(projects);
       }
     } catch (err) {
-      console.error('금형 프로젝트 로드 오류:', err);
       setMoldProjects([]);
     }
   };
@@ -203,7 +199,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ currentUser }) => {
         setPartsProjects(projects);
       }
     } catch (err) {
-      console.error('부품구매 프로젝트 로드 오류:', err);
       setPartsProjects([]);
     }
   };
@@ -223,7 +218,6 @@ const AdminPage: React.FC<AdminPageProps> = ({ currentUser }) => {
         setMjProjects(projects);
       }
     } catch (err) {
-      console.error('MJ 프로젝트 로드 오류:', err);
       setMjProjects([]);
     }
   };
@@ -393,7 +387,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ currentUser }) => {
         [userId]: response.data.partners || []
       }));
     } catch (err) {
-      console.error('사용자 파트너스 로드 오류:', err);
+      // 파트너스 로드 실패 시 무시
     }
   };
 

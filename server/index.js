@@ -115,9 +115,6 @@ app.use((err, req, res, next) => {
 // 서버 시작
 app.listen(PORT, async () => {
   console.log(`🚀 Labsemble 서버가 포트 ${PORT}에서 실행 중입니다.`);
-  console.log(`📡 API 엔드포인트: http://localhost:${PORT}`);
-  console.log(`🔍 상태 확인: http://localhost:${PORT}/api/health`);
-  console.log(`🗄️ 데이터베이스 테스트: http://localhost:${PORT}/api/db-test`);
   
   // 데이터베이스 연결 테스트 및 초기화
   try {

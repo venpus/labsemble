@@ -34,11 +34,6 @@ const upload = multer({
 // MJ 프로젝트 등록
 router.post('/', authenticateToken, upload.array('productImages', 5), async (req, res) => {
   try {
-    console.log('MJ 프로젝트 등록 요청:', {
-      body: req.body,
-      files: req.files,
-      userId: req.user.id
-    });
     
                 const { productName, quantity, referenceLink, purchaseLink, expectedShippingDate } = req.body;
     const userId = req.user.id;
@@ -136,11 +131,7 @@ router.get('/', authenticateToken, async (req, res) => {
     `);
 
     // 이미지 경로 디버깅 로그
-    console.log('MJ 프로젝트 조회 결과:', projects.map(p => ({
-      id: p.id,
-      product_name: p.product_name,
-      image_paths: p.image_paths
-    })));
+    
 
     connection.release();
 

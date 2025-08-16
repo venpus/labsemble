@@ -25,8 +25,6 @@ async function testConnection() {
   try {
     const connection = await pool.getConnection();
     console.log('✅ MariaDB 연결 성공!');
-    console.log(`📊 데이터베이스: ${dbConfig.database}`);
-    console.log(`🌐 호스트: ${dbConfig.host}:${dbConfig.port}`);
     connection.release();
     return true;
   } catch (error) {
@@ -64,29 +62,20 @@ async function initializeDatabase() {
     // 기존 테이블에 새로운 컬럼 추가 (이미 존재하는 경우 무시)
     try {
       await connection.execute('ALTER TABLE users ADD COLUMN company_name VARCHAR(100)');
-      console.log('✅ company_name 컬럼 추가됨');
     } catch (error) {
-      if (error.code === 'ER_DUP_FIELDNAME') {
-        console.log('ℹ️ company_name 컬럼이 이미 존재함');
-      }
+      // 컬럼이 이미 존재하는 경우 무시
     }
 
     try {
       await connection.execute('ALTER TABLE users ADD COLUMN contact_person VARCHAR(50)');
-      console.log('✅ contact_person 컬럼 추가됨');
     } catch (error) {
-      if (error.code === 'ER_DUP_FIELDNAME') {
-        console.log('ℹ️ contact_person 컬럼이 이미 존재함');
-      }
+      // 컬럼이 이미 존재하는 경우 무시
     }
 
     try {
       await connection.execute('ALTER TABLE users ADD COLUMN phone_number VARCHAR(20)');
-      console.log('✅ phone_number 컬럼 추가됨');
     } catch (error) {
-      if (error.code === 'ER_DUP_FIELDNAME') {
-        console.log('ℹ️ phone_number 컬럼이 이미 존재함');
-      }
+      // 컬럼이 이미 존재하는 경우 무시
     }
 
     // 세금계산서 관련 컬럼 추가
@@ -101,60 +90,40 @@ async function initializeDatabase() {
 
     try {
       await connection.execute('ALTER TABLE users ADD COLUMN business_number VARCHAR(20)');
-      console.log('✅ business_number 컬럼 추가됨');
     } catch (error) {
-      if (error.code === 'ER_DUP_FIELDNAME') {
-        console.log('ℹ️ business_number 컬럼이 이미 존재함');
-      }
+      // 컬럼이 이미 존재하는 경우 무시
     }
 
     try {
       await connection.execute('ALTER TABLE users ADD COLUMN business_address TEXT');
-      console.log('✅ business_address 컬럼 추가됨');
     } catch (error) {
-      if (error.code === 'ER_DUP_FIELDNAME') {
-        console.log('ℹ️ business_address 컬럼이 이미 존재함');
-      }
+      // 컬럼이 이미 존재하는 경우 무시
     }
 
     try {
       await connection.execute('ALTER TABLE users ADD COLUMN ceo_name VARCHAR(50)');
-      console.log('✅ ceo_name 컬럼 추가됨');
     } catch (error) {
-      if (error.code === 'ER_DUP_FIELDNAME') {
-        console.log('ℹ️ ceo_name 컬럼이 이미 존재함');
-      }
+      // 컬럼이 이미 존재하는 경우 무시
     }
 
     try {
       await connection.execute('ALTER TABLE users ADD COLUMN tax_email VARCHAR(100)');
-      console.log('✅ tax_email 컬럼 추가됨');
     } catch (error) {
-      if (error.code === 'ER_DUP_FIELDNAME') {
-        console.log('ℹ️ tax_email 컬럼이 이미 존재함');
-      }
+      // 컬럼이 이미 존재하는 경우 무시
     }
 
      // admin 권한 컬럼 추가
      try {
        await connection.execute('ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE');
-       console.log('✅ is_admin 컬럼 추가됨');
      } catch (error) {
-       if (error.code === 'ER_DUP_FIELDNAME') {
-         console.log('ℹ️ is_admin 컬럼이 이미 존재함');
-       }
+       // 컬럼이 이미 존재하는 경우 무시
      }
 
      // vip_partners 테이블이 이미 존재하는지 확인
      try {
-       const [existingTables] = await connection.execute("SHOW TABLES LIKE 'vip_partners'");
-       if (existingTables.length > 0) {
-         console.log('ℹ️ vip_partners 테이블이 이미 존재함');
-       } else {
-         console.log('ℹ️ vip_partners 테이블이 존재하지 않음');
-       }
+       await connection.execute("SHOW TABLES LIKE 'vip_partners'");
      } catch (error) {
-       console.log('ℹ️ vip_partners 테이블 상태 확인 중 오류:', error.message);
+       // 테이블 확인 중 오류 발생 시 무시
      }
 
      // VIP 파트너스 테이블 생성
@@ -166,7 +135,6 @@ async function initializeDatabase() {
          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
        )
      `);
-     console.log('✅ vip_partners 테이블 생성됨');
 
      // 사용자-파트너스 관계 테이블 생성
      await connection.execute(`
@@ -180,7 +148,6 @@ async function initializeDatabase() {
          UNIQUE KEY unique_user_partner (user_id, partner_id)
        )
      `);
-     console.log('✅ user_partners 테이블 생성됨');
 
      // MJ 프로젝트 테이블 생성
      await connection.execute(`
@@ -206,24 +173,18 @@ async function initializeDatabase() {
      // 기존 테이블에 출고 예정일 컬럼 추가 (이미 존재하는 경우 무시)
      try {
        await connection.execute('ALTER TABLE mj_projects ADD COLUMN expected_shipping_date DATE');
-       console.log('✅ expected_shipping_date 컬럼 추가됨');
      } catch (error) {
-       if (error.code === 'ER_DUP_FIELDNAME') {
-         console.log('ℹ️ expected_shipping_date 컬럼이 이미 존재함');
-       }
+       // 컬럼이 이미 존재하는 경우 무시
      }
 
      // 기존 테이블에 구매링크 컬럼 추가 (이미 존재하는 경우 무시)
      try {
        await connection.execute('ALTER TABLE mj_projects ADD COLUMN purchase_link TEXT');
-       console.log('✅ purchase_link 컬럼 추가됨');
      } catch (error) {
-       if (error.code === 'ER_DUP_FIELDNAME') {
-         console.log('ℹ️ purchase_link 컬럼이 이미 존재함');
-       }
+       // 컬럼이 이미 존재하는 경우 무시
      }
 
-    console.log('✅ 데이터베이스 테이블 초기화 완료!');
+
     connection.release();
   } catch (error) {
     console.error('❌ 데이터베이스 초기화 실패:', error.message);

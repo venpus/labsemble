@@ -386,11 +386,7 @@ const WorkStatusManagement: React.FC<WorkStatusManagementProps> = ({ currentUser
           }
         }));
 
-        console.log('드래그 앤 드롭 순서 변경:', {
-          oldIndex,
-          newIndex,
-          updatedStatuses: updatedStatuses.map(s => ({ id: s.id, name: s.name, order: s.order }))
-        });
+
 
         // 서버에 모든 순서 변경 요청 (배치 처리)
         try {
@@ -401,7 +397,7 @@ const WorkStatusManagement: React.FC<WorkStatusManagementProps> = ({ currentUser
           );
           
           await Promise.all(updatePromises);
-          console.log('순서 변경이 성공적으로 저장되었습니다.');
+
         } catch (err) {
           console.error('순서 변경 실패:', err);
           // 실패 시 원래 상태로 복원

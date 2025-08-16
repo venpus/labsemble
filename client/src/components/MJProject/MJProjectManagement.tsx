@@ -72,7 +72,6 @@ const MJProjectManagement: React.FC<MJProjectManagementProps> = ({ users }) => {
         setMjProjects(projectsWithUserInfo);
       }
     } catch (err) {
-      console.error('MJ 프로젝트 로드 오류:', err);
       setMjProjects([]);
     }
   };
@@ -104,7 +103,6 @@ const MJProjectManagement: React.FC<MJProjectManagementProps> = ({ users }) => {
       alert('프로젝트 상태가 변경되었습니다.');
       await loadMJProjects(); // 프로젝트 목록 새로고침
     } catch (err) {
-      console.error('프로젝트 상태 변경 오류:', err);
       alert('상태 변경에 실패했습니다.');
     }
   };

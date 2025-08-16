@@ -30,32 +30,32 @@ const createWorkStatusTable = async () => {
       `;
       
       await pool.query(createTableQuery);
-      console.log('작업상태 테이블이 생성되었습니다.');
+  
     } else {
       // 기존 테이블에 status_type 컬럼 추가
       try {
         await pool.query('ALTER TABLE work_statuses ADD COLUMN status_type VARCHAR(50) NOT NULL DEFAULT "work" AFTER category');
-        console.log('status_type 컬럼이 추가되었습니다.');
+
         
         // 인덱스 추가
         try {
           await pool.query('ALTER TABLE work_statuses ADD INDEX idx_status_type (status_type)');
           await pool.query('ALTER TABLE work_statuses ADD INDEX idx_order (category, status_type, `order`)');
-          console.log('새로운 인덱스가 추가되었습니다.');
+
         } catch (indexError) {
-          console.log('인덱스 추가 중 오류 (이미 존재할 수 있음):', indexError.message);
+          // 인덱스가 이미 존재하는 경우 무시
         }
         
         // 기존 데이터의 status_type을 'work'로 설정
         try {
           await pool.query('UPDATE work_statuses SET status_type = "work" WHERE status_type IS NULL OR status_type = ""');
-          console.log('기존 데이터의 status_type이 업데이트되었습니다.');
-        } catch (updateError) {
-          console.log('기존 데이터 업데이트 중 오류:', updateError.message);
-        }
+          
+      } catch (updateError) {
+        // 기존 데이터 업데이트 중 오류 발생 시 무시
+      }
       } catch (columnError) {
         if (columnError.code === 'ER_DUP_FIELDNAME') {
-          console.log('status_type 컬럼이 이미 존재합니다.');
+    
         } else {
           console.error('컬럼 추가 오류:', columnError);
         }
@@ -166,7 +166,7 @@ const insertDefaultStatuses = async () => {
       }
     }
     
-    console.log('기본 작업상태 데이터가 준비되었습니다.');
+
   } catch (error) {
     console.error('기본 작업상태 데이터 삽입 오류:', error);
   }
@@ -571,7 +571,7 @@ router.post('/reorder-all', auth, async (req, res) => {
             await connection.execute(updateQuery, [i + 1, statuses[i].id]);
           }
           
-          console.log(`${category} - ${statusType}: ${statuses.length}개 순서 정리 완료`);
+    
         }
       }
       
@@ -645,7 +645,7 @@ router.post('/remove-duplicates', auth, async (req, res) => {
               });
             }
             
-            console.log(`${category} - ${statusType}: "${duplicate.name}" 중복 제거 완료 (${duplicate.count - 1}개 삭제)`);
+    
           }
         }
       }

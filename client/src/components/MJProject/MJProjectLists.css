@@ -1,22 +1,31 @@
-/* MJ 프로젝트 테이블 - 최소 기본 스타일 */
-.mj-projects-table {
-  /* 기본 테이블 컨테이너 */
+/* MJ 프로젝트 컨테이너 - 최소 기본 스타일 */
+.mj-projects-container {
+  /* 기본 컨테이너 */
 }
 
-.mj-projects-table table {
+.projects-table {
+  /* 프로젝트 목록 테이블 */
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.projects-table table {
   width: 100%;
   border-collapse: collapse;
+  margin: 0;
 }
 
-.mj-projects-table th {
+.projects-table th {
   /* 테이블 헤더 */
 }
 
-.mj-projects-table td {
+.projects-table td {
   /* 테이블 셀 */
 }
 
-.mj-projects-table tr:hover {
+.projects-table tr:hover {
   /* 행 호버 효과 */
 }
 
@@ -60,18 +69,95 @@
   /* 버튼 호버 효과 */
 }
 
+/* 상세보기 화면 컨테이너 */
+.detail-view-container {
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+/* 상세보기 화면 스타일 */
+.detail-view {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.back-btn {
+  padding: 0.75rem 1.5rem;
+  background: #6b7280;
+  color: white;
+  border: 1px solid #4b5563;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.back-btn:hover {
+  background: #4b5563;
+  border-color: #374151;
+  box-shadow: 0 2px 4px rgba(107, 114, 128, 0.3);
+}
+
+.detail-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white;
+}
+
 /* 반응형 디자인 */
 @media (max-width: 768px) {
-  .mj-projects-table {
+  .mj-projects-container {
     /* 모바일 대응 */
   }
   
-  .mj-projects-table th,
-  .mj-projects-table td {
+  .projects-table th,
+  .projects-table td {
     /* 모바일 셀 스타일 */
   }
   
   .project-thumbnail {
     /* 모바일 썸네일 */
+  }
+  
+  .detail-view-container {
+    padding: 0;
+  }
+  
+  .detail-view {
+    padding: 1rem;
+  }
+  
+  .detail-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .back-btn {
+    width: 100%;
+    justify-content: center;
   }
 } 

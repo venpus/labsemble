@@ -12,8 +12,9 @@
 .admin-main {
   margin-left: 280px;
   flex: 1;
-  padding: 2rem;
+  padding: 1rem;
   overflow-y: auto;
+  height: calc(100vh - 100px);
 }
 
 /* 상태 뱃지 스타일 */
@@ -33,20 +34,22 @@
 }
 
 /* 메인 콘텐츠 영역 */
-.admin-main {
-  flex: 1;
-  margin-left: 280px;
-  padding: 2rem;
-  overflow-y: auto;
-  height: calc(100vh - 100px);
-}
-
 .main-content {
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(15px);
   border-radius: 20px;
-  padding: 2rem;
+  padding: 1.5rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* MJ 프로젝트 관련 컴포넌트들의 컨테이너 스타일 통일 */
+.main-content > * {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 

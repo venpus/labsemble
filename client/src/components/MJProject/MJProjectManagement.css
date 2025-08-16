@@ -1,9 +1,18 @@
 /* MJ 프로젝트 관리 섹션 */
 .mj-projects-section {
-  padding: 2rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  border: none;
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 상세보기 화면일 때 헤더 숨김 */
+.mj-projects-section.detail-mode .section-header,
+.mj-projects-section.detail-mode .error-message {
+  display: none;
 }
 
 /* 섹션 헤더 */

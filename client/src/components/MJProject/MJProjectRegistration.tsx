@@ -11,7 +11,9 @@ const MJProjectRegistration: React.FC<MJProjectRegistrationProps> = ({ currentUs
     productName: '',
     quantity: '',
     productImages: [] as File[],
-    referenceLink: ''
+    referenceLink: '',
+    purchaseLink: '',
+    expectedShippingDate: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -65,6 +67,12 @@ const MJProjectRegistration: React.FC<MJProjectRegistrationProps> = ({ currentUs
       const formDataToSend = new FormData();
       formDataToSend.append('productName', formData.productName);
       formDataToSend.append('quantity', formData.quantity);
+      if (formData.expectedShippingDate) {
+        formDataToSend.append('expectedShippingDate', formData.expectedShippingDate);
+      }
+      if (formData.purchaseLink) {
+        formDataToSend.append('purchaseLink', formData.purchaseLink);
+      }
       formData.productImages.forEach((image) => {
         formDataToSend.append('productImages', image);
       });
@@ -164,7 +172,19 @@ const MJProjectRegistration: React.FC<MJProjectRegistrationProps> = ({ currentUs
               />
             </div>
 
-
+            <div className="form-group">
+              <label htmlFor="expectedShippingDate" className="form-label">
+                출고 예정일
+              </label>
+              <input
+                type="date"
+                id="expectedShippingDate"
+                value={formData.expectedShippingDate}
+                onChange={(e) => handleInputChange('expectedShippingDate', e.target.value)}
+                className="form-input"
+                placeholder="출고 예정일을 선택해주세요"
+              />
+            </div>
 
             <div className="form-group">
               <label htmlFor="referenceLink" className="form-label">
@@ -177,6 +197,20 @@ const MJProjectRegistration: React.FC<MJProjectRegistrationProps> = ({ currentUs
                 onChange={(e) => handleInputChange('referenceLink', e.target.value)}
                 className="form-input"
                 placeholder="상품 참고 링크를 입력해주세요 (선택사항)"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="purchaseLink" className="form-label">
+                구매 링크
+              </label>
+              <input
+                type="url"
+                id="purchaseLink"
+                value={formData.purchaseLink}
+                onChange={(e) => handleInputChange('purchaseLink', e.target.value)}
+                className="form-input"
+                placeholder="상품 구매 링크를 입력해주세요 (선택사항)"
               />
             </div>
 

@@ -14,6 +14,7 @@ interface MJProject {
   payment_status?: 'pending' | 'completed' | 'failed';
   delivery_status?: 'waiting' | 'processing' | 'completed' | 'delivered';
   invoice_status?: 'not_issued' | 'issued';
+  expected_shipping_date?: string;
   project_code?: string;
   created_at: string;
   updated_at: string;
@@ -38,6 +39,7 @@ interface MJProjectManagementProps {
 const MJProjectManagement: React.FC<MJProjectManagementProps> = ({ users }) => {
   const [mjProjects, setMjProjects] = useState<MJProject[]>([]);
   const [error, setError] = useState('');
+  const [showDetail, setShowDetail] = useState(false);
 
   useEffect(() => {
     loadMJProjects();
@@ -75,10 +77,7 @@ const MJProjectManagement: React.FC<MJProjectManagementProps> = ({ users }) => {
     }
   };
 
-  const handleViewProject = (project: MJProject) => {
-    // 프로젝트 상세보기 기능 제거됨
-    alert(`프로젝트 상세보기: ${project.product_name}\n사용자: ${project.username}\n회사: ${project.company_name}`);
-  };
+  // 상세보기 기능은 MJProjectLists 컴포넌트에서 처리됩니다.
 
   const handleEditProject = async (projectId: number, currentStatus: string) => {
     const newStatus = prompt(`프로젝트 상태를 변경하세요 (요청접수/검토중/승인됨/처리중/완료):`, currentStatus);
@@ -114,29 +113,35 @@ const MJProjectManagement: React.FC<MJProjectManagementProps> = ({ users }) => {
 
   return (
     <div className="mj-projects-section">
-      <div className="section-header">
-        <h2>MJ 프로젝트 관리</h2>
-        <div className="header-buttons">
-          <button className="refresh-btn" onClick={loadMJProjects}>
-            🔄 새로고침
-          </button>
-        </div>
-      </div>
-      
-      {error && (
-        <div className="error-message">
-          <p>❌ {error}</p>
-          <button onClick={() => setError('')}>닫기</button>
-        </div>
+      {/* 상세보기 화면일 때는 헤더를 숨김 */}
+      {!showDetail && (
+        <>
+          <div className="section-header">
+            <h2>MJ 프로젝트 관리</h2>
+            <div className="header-buttons">
+              <button className="refresh-btn" onClick={loadMJProjects}>
+                🔄 새로고침
+              </button>
+            </div>
+          </div>
+          
+          {error && (
+            <div className="error-message">
+              <p>❌ {error}</p>
+              <button onClick={() => setError('')}>닫기</button>
+            </div>
+          )}
+        </>
       )}
       
-              <MJProjectLists 
-          mjProjects={mjProjects} 
-          isAdmin={users.some(user => user.is_admin)}
-        />
-        
-      </div>
-    );
-  };
+      <MJProjectLists 
+        mjProjects={mjProjects} 
+        isAdmin={users.some(user => user.is_admin)}
+        showDetail={showDetail}
+        setShowDetail={setShowDetail}
+      />
+    </div>
+  );
+};
 
 export default MJProjectManagement; 

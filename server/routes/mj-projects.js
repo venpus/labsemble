@@ -40,7 +40,7 @@ router.post('/', authenticateToken, upload.array('productImages', 5), async (req
       userId: req.user.id
     });
     
-    const { productName, quantity, referenceLink } = req.body;
+                const { productName, quantity, referenceLink, purchaseLink, expectedShippingDate } = req.body;
     const userId = req.user.id;
 
     if (!productName || !quantity) {
@@ -72,9 +72,9 @@ router.post('/', authenticateToken, upload.array('productImages', 5), async (req
 
     // 프로젝트 등록
     const [result] = await connection.execute(
-      `INSERT INTO mj_projects (user_id, product_name, quantity, reference_link, image_paths, status, project_code, payment_status, delivery_status, created_at, updated_at) 
-       VALUES (?, ?, ?, ?, ?, '요청접수', ?, NULL, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
-      [userId, productName, quantity, referenceLink || null, JSON.stringify(imagePaths), projectCode]
+      `INSERT INTO mj_projects (user_id, product_name, quantity, reference_link, purchase_link, image_paths, status, project_code, payment_status, delivery_status, expected_shipping_date, created_at, updated_at) 
+       VALUES (?, ?, ?, ?, ?, ?, '요청접수', ?, NULL, NULL, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+      [userId, productName, quantity, referenceLink || null, purchaseLink || null, JSON.stringify(imagePaths), projectCode, expectedShippingDate || null]
     );
 
     connection.release();
@@ -116,11 +116,13 @@ router.get('/', authenticateToken, async (req, res) => {
         mp.product_name,
         mp.quantity,
         mp.reference_link,
+        mp.purchase_link,
         mp.image_paths,
         mp.status,
         mp.price,
         mp.payment_status,
         mp.delivery_status,
+        mp.expected_shipping_date,
         mp.project_code,
         mp.created_at,
         mp.updated_at,
@@ -148,6 +150,35 @@ router.get('/', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error('MJ 프로젝트 조회 오류:', error);
     res.status(500).json({ error: 'MJ 프로젝트를 불러오는데 실패했습니다.' });
+  }
+});
+
+// MJ 프로젝트 구매링크 수정
+router.patch('/:id/purchase-link', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { purchaseLink } = req.body;
+
+    if (purchaseLink === undefined) {
+      return res.status(400).json({ error: '구매링크가 필요합니다.' });
+    }
+
+    const connection = await pool.getConnection();
+    
+    await connection.execute(
+      'UPDATE mj_projects SET purchase_link = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [purchaseLink, id]
+    );
+
+    connection.release();
+
+    res.json({
+      success: true,
+      message: '구매링크가 성공적으로 수정되었습니다.'
+    });
+  } catch (error) {
+    console.error('구매링크 수정 오류:', error);
+    res.status(500).json({ error: '구매링크 수정에 실패했습니다.' });
   }
 });
 

@@ -195,12 +195,33 @@ async function initializeDatabase() {
          price DECIMAL(10,2),
          payment_status ENUM('pending', 'completed', 'failed') DEFAULT 'pending',
          delivery_status ENUM('waiting', 'processing', 'completed', 'delivered') DEFAULT 'waiting',
+         expected_shipping_date DATE,
          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
          FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
        )
      `);
      console.log('✅ mj_projects 테이블 생성됨');
+
+     // 기존 테이블에 출고 예정일 컬럼 추가 (이미 존재하는 경우 무시)
+     try {
+       await connection.execute('ALTER TABLE mj_projects ADD COLUMN expected_shipping_date DATE');
+       console.log('✅ expected_shipping_date 컬럼 추가됨');
+     } catch (error) {
+       if (error.code === 'ER_DUP_FIELDNAME') {
+         console.log('ℹ️ expected_shipping_date 컬럼이 이미 존재함');
+       }
+     }
+
+     // 기존 테이블에 구매링크 컬럼 추가 (이미 존재하는 경우 무시)
+     try {
+       await connection.execute('ALTER TABLE mj_projects ADD COLUMN purchase_link TEXT');
+       console.log('✅ purchase_link 컬럼 추가됨');
+     } catch (error) {
+       if (error.code === 'ER_DUP_FIELDNAME') {
+         console.log('ℹ️ purchase_link 컬럼이 이미 존재함');
+       }
+     }
 
     console.log('✅ 데이터베이스 테이블 초기화 완료!');
     connection.release();

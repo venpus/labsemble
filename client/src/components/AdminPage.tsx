@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { apiService } from '../services/api';
+import Sidebar from './Sidebar';
 import WorkStatusManagement from './WorkStatusManagement';
 import MJProjectManagement from './MJProject/MJProjectManagement';
 import './AdminPage.css';
@@ -42,7 +43,11 @@ interface SystemStats {
   systemStatus: string;
 }
 
-const AdminPage: React.FC = () => {
+interface AdminPageProps {
+  currentUser: any;
+}
+
+const AdminPage: React.FC<AdminPageProps> = ({ currentUser }) => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [users, setUsers] = useState<User[]>([]);
   const [partners, setPartners] = useState<VipPartner[]>([]);
@@ -442,78 +447,15 @@ const AdminPage: React.FC = () => {
 
   return (
     <div className="admin-page">
-      <div className="admin-sidebar">
-        <div className="sidebar-header">
-          <h2>🔧 관리자</h2>
-          <p>Labsemble 시스템</p>
-        </div>
-        
-        <nav className="sidebar-nav">
-          <button 
-            className={`sidebar-item ${activeTab === 'dashboard' ? 'active' : ''}`}
-            onClick={() => setActiveTab('dashboard')}
-          >
-            <span className="sidebar-icon">📊</span>
-            <span className="sidebar-text">대시보드</span>
-          </button>
-          
-          <button 
-            className={`sidebar-item ${activeTab === 'users' ? 'active' : ''}`}
-            onClick={() => setActiveTab('users')}
-          >
-            <span className="sidebar-icon">👥</span>
-            <span className="sidebar-text">사용자 관리</span>
-          </button>
-          
-          <button 
-            className={`sidebar-item ${activeTab === 'partners' ? 'active' : ''}`}
-            onClick={() => setActiveTab('partners')}
-          >
-            <span className="sidebar-icon">💎</span>
-            <span className="sidebar-text">VIP 파트너스</span>
-          </button>
-          
-          <button 
-            className={`sidebar-item ${activeTab === 'mj-projects' ? 'active' : ''}`}
-            onClick={() => setActiveTab('mj-projects')}
-          >
-            <span className="sidebar-icon">🛠️</span>
-            <span className="sidebar-text">MJ 프로젝트</span>
-            <span className="project-count" style={{ 
-              color: 'white', 
-              fontSize: '12px', 
-              marginLeft: '8px',
-              backgroundColor: 'rgba(255, 255, 255, 0.2)',
-              padding: '2px 6px',
-              borderRadius: '10px',
-              minWidth: '20px',
-              textAlign: 'center'
-            }}>
-              {mjProjects.filter(project => 
-                project.status !== '완료' && project.status !== '취소'
-              ).length}
-            </span>
-          </button>
-          
-
-          
-          <button 
-            className={`sidebar-item ${activeTab === 'work-status' ? 'active' : ''}`}
-            onClick={() => setActiveTab('work-status')}
-          >
-            <span className="sidebar-icon">📋</span>
-            <span className="sidebar-text">작업상태목록관리</span>
-          </button>
-          
-          <button 
-            className={`sidebar-item ${activeTab === 'system' ? 'active' : ''}`}
-            onClick={() => setActiveTab('system')}
-          >
-            <span className="sidebar-icon">⚙️</span>
-            <span className="sidebar-text">시스템 설정</span>
-          </button>
-        </nav>
-      </div>
+      <Sidebar
+        currentUser={currentUser}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        userType="admin"
+        mjProjectCount={mjProjects.filter(project => 
+          project.status !== '완료' && project.status !== '취소'
+        ).length}
+      />
 
       <div className="admin-main">
 

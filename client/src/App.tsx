@@ -171,7 +171,7 @@ function App() {
 
     // 관리자 권한 사용자는 바로 관리자 페이지로 이동
     if (currentUser?.is_admin) {
-      return <AdminPage />;
+      return <AdminPage currentUser={currentUser} />;
     }
 
     // MJ 프로젝트 등록 페이지가 열려있으면 해당 페이지 표시

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { apiService } from '../services/api';
+import Sidebar from './Sidebar';
 import './UserDashboard.css';
 
 interface User {
@@ -188,48 +189,13 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ currentUser, onOpenMJRegi
 
   return (
     <div className="user-dashboard">
-      <div className="user-sidebar">
-        <div className="sidebar-header">
-          <h2>👋 {currentUser.username}님</h2>
-          <p>Labsemble 서비스</p>
-        </div>
-        
-        <nav className="sidebar-nav">
-          <button 
-            className={`sidebar-item ${activeTab === 'dashboard' ? 'active' : ''}`}
-            onClick={() => setActiveTab('dashboard')}
-          >
-            <span className="sidebar-icon">📊</span>
-            <span className="sidebar-text">대시보드</span>
-          </button>
-          
-          <button 
-            className={`sidebar-item ${activeTab === 'profile' ? 'active' : ''}`}
-            onClick={() => setActiveTab('profile')}
-          >
-            <span className="sidebar-icon">👤</span>
-            <span className="sidebar-text">내 정보</span>
-          </button>
-          
-
-          
-          <button 
-            className={`sidebar-item ${activeTab === 'services' ? 'active' : ''}`}
-            onClick={() => setActiveTab('services')}
-          >
-            <span className="sidebar-icon">🛠️</span>
-            <span className="sidebar-text">MJ 서비스</span>
-          </button>
-          
-          <button 
-            className={`sidebar-item ${activeTab === 'support' ? 'active' : ''}`}
-            onClick={() => setActiveTab('support')}
-          >
-            <span className="sidebar-icon">📞</span>
-            <span className="sidebar-text">문의 및 지원</span>
-          </button>
-        </nav>
-      </div>
+      <Sidebar
+        currentUser={currentUser}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        userType="user"
+        onOpenMJRegistration={onOpenMJRegistration}
+      />
 
       <div className="user-main">
         {error && (

@@ -1,0 +1,368 @@
+/* 프로젝트 정보 섹션 */
+.project-info-section {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 2rem;
+}
+
+.project-info-section h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.project-info-section .info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.project-info-section .info-grid:last-child {
+  margin-bottom: 0;
+}
+
+.project-info-section .info-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.project-info-section .info-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.project-info-section .info-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(59, 130, 246, 0.3);
+  transform: translateY(-2px);
+}
+
+.project-info-section .info-label {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.project-info-section .info-value {
+  color: white;
+  flex: 1;
+}
+
+/* 수정 가능한 영역 스타일 */
+.project-info-section .editable-field {
+  background: linear-gradient(135deg, #ff8c00, #ff6b35);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(255, 140, 0, 0.3);
+  border: 1px solid #ff8c00;
+  transition: all 0.3s ease;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+}
+
+.project-info-section .editable-field:hover {
+  background: linear-gradient(135deg, #ff6b35, #ff8c00);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(255, 140, 0, 0.4);
+}
+
+/* 수정 컨테이너 스타일 */
+.project-info-section .edit-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.project-info-section .display-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* 입력 필드 스타일 */
+.project-info-section .info-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0.5rem;
+  width: 100%;
+  outline: none;
+  text-align: center;
+}
+
+.project-info-section .info-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.project-info-section .info-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+
+.project-info-section .info-input::-webkit-outer-spin-button,
+.project-info-section .info-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.project-info-section .info-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* 수정 버튼 스타일 */
+.project-info-section .edit-btn {
+  padding: 0.4rem 0.8rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.project-info-section .edit-btn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+/* 저장/취소 버튼 스타일 */
+.project-info-section .edit-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.project-info-section .save-btn,
+.project-info-section .cancel-btn {
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.project-info-section .save-btn {
+  background: #10b981;
+  color: white;
+}
+
+.project-info-section .save-btn:hover {
+  background: #059669;
+}
+
+.project-info-section .save-btn:disabled {
+  background: #6b7280;
+  cursor: not-allowed;
+}
+
+.project-info-section .cancel-btn {
+  background: #6b7280;
+  color: white;
+}
+
+.project-info-section .cancel-btn:hover {
+  background: #4b5563;
+}
+
+/* 링크 관련 스타일 */
+.project-info-section .clickable-link {
+  color: #3b82f6;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  word-break: break-all;
+}
+
+.project-info-section .clickable-link:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+  text-decoration: underline;
+}
+
+.project-info-section .link-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.project-info-section .reference-link {
+  color: #10b981;
+}
+
+.project-info-section .reference-link:hover {
+  background: rgba(16, 185, 129, 0.1);
+  color: #34d399;
+}
+
+.project-info-section .purchase-link {
+  color: #f59e0b;
+}
+
+.project-info-section .purchase-link:hover {
+  background: rgba(245, 158, 11, 0.1);
+  color: #fbbf24;
+}
+
+/* 링크 수정 관련 스타일 */
+.project-info-section .link-display {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.project-info-section .edit-link-btn {
+  padding: 0.5rem 1rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.project-info-section .edit-link-btn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+.project-info-section .edit-link-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.project-info-section .link-edit-input {
+  padding: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 0.9rem;
+  width: 100%;
+}
+
+.project-info-section .link-edit-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.project-info-section .link-edit-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.project-info-section .save-link-btn,
+.project-info-section .cancel-link-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.project-info-section .save-link-btn {
+  background: #10b981;
+  color: white;
+}
+
+.project-info-section .save-link-btn:hover {
+  background: #059669;
+}
+
+.project-info-section .save-link-btn:disabled {
+  background: #6b7280;
+  cursor: not-allowed;
+}
+
+.project-info-section .cancel-link-btn {
+  background: #6b7280;
+  color: white;
+}
+
+.project-info-section .cancel-link-btn:hover {
+  background: #4b5563;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .project-info-section .info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .project-info-section .info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .project-info-section .info-label {
+    min-width: auto;
+  }
+  
+  .project-info-section .editable-field {
+    width: 100%;
+    text-align: left;
+  }
+  
+  .project-info-section .edit-container {
+    width: 100%;
+  }
+  
+  .project-info-section .display-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .project-info-section .edit-actions {
+    flex-direction: column;
+  }
+  
+  .project-info-section .link-display {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .project-info-section .edit-actions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .project-info-section h3 {
+    font-size: 1.25rem;
+  }
+} 

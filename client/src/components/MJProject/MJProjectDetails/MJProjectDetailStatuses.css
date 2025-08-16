@@ -1,0 +1,105 @@
+/* 상태 정보 섹션 */
+.statuses-section {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 2rem;
+}
+
+.statuses-section h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.statuses-section .info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.statuses-section .info-grid:last-child {
+  margin-bottom: 0;
+}
+
+.statuses-section .info-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.statuses-section .info-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(59, 130, 246, 0.3);
+  transform: translateY(-2px);
+}
+
+.statuses-section .info-label {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.statuses-section .info-value {
+  color: white;
+  flex: 1;
+}
+
+/* 수정 가능한 영역 스타일 */
+.statuses-section .editable-field {
+  background: linear-gradient(135deg, #ff8c00, #ff6b35);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(255, 140, 0, 0.3);
+  border: 1px solid #ff8c00;
+  transition: all 0.3s ease;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+}
+
+.statuses-section .editable-field:hover {
+  background: linear-gradient(135deg, #ff6b35, #ff8c00);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(255, 140, 0, 0.4);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .statuses-section .info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .statuses-section .info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .statuses-section .info-label {
+    min-width: auto;
+  }
+  
+  .statuses-section .editable-field {
+    width: 100%;
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .statuses-section h3 {
+    font-size: 1.25rem;
+  }
+} 

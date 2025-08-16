@@ -1,0 +1,231 @@
+/* 결제상태 섹션 */
+.payments-statuses-section {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 2rem;
+}
+
+.payments-statuses-section h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.payments-statuses-section .info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.payments-statuses-section .info-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.payments-statuses-section .info-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(59, 130, 246, 0.3);
+  transform: translateY(-2px);
+}
+
+.payments-statuses-section .info-label {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.payments-statuses-section .info-value {
+  color: white;
+  flex: 1;
+}
+
+/* 수정 가능한 영역 스타일 */
+.payments-statuses-section .editable-field {
+  background: linear-gradient(135deg, #ff8c00, #ff6b35);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(255, 140, 0, 0.3);
+  border: 1px solid #ff8c00;
+  transition: all 0.3s ease;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+}
+
+.payments-statuses-section .editable-field:hover {
+  background: linear-gradient(135deg, #ff6b35, #ff8c00);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(255, 140, 0, 0.4);
+}
+
+/* 자동 계산되는 영역 스타일 */
+.payments-statuses-section .auto-calculated {
+  background: linear-gradient(135deg, #10b981, #059669);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+  border: 1px solid #10b981;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 120px;
+  text-align: center;
+}
+
+.payments-statuses-section .calculation-note {
+  font-size: 0.75rem;
+  font-weight: 500;
+  opacity: 0.8;
+  color: #d1fae5;
+}
+
+/* 입력 필드 스타일 */
+.payments-statuses-section .payment-input {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  width: 100%;
+  outline: none;
+}
+
+.payments-statuses-section .payment-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+}
+
+.payments-statuses-section .payment-input::-webkit-outer-spin-button,
+.payments-statuses-section .payment-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.payments-statuses-section .payment-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* 총 결제 금액과 견적승인을 별도 줄에 배치 */
+.payments-statuses-section .payment-bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* 견적승인 선택 상자 스타일 */
+.payments-statuses-section .quotation-select {
+  padding: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.payments-statuses-section .quotation-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.payments-statuses-section .quotation-select option {
+  background: #1f2937;
+  color: white;
+}
+
+/* 견적승인 상태별 색상 */
+.payments-statuses-section .quotation-approval .quotation-select[value="승인됨"] {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.payments-statuses-section .quotation-approval .quotation-select[value="거절됨"] {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.payments-statuses-section .quotation-approval .quotation-select[value="승인 대기"] {
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+}
+
+/* 총 결제 금액 특별 스타일 */
+.payments-statuses-section .info-item.total-payment {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+  font-weight: 600;
+}
+
+.payments-statuses-section .info-item.total-payment .info-value {
+  color: #10b981;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .payments-statuses-section .info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .payments-statuses-section .payment-bottom-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .payments-statuses-section .info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .payments-statuses-section .info-label {
+    min-width: auto;
+  }
+  
+  .payments-statuses-section .quotation-select {
+    width: 100%;
+    padding: 0.75rem;
+  }
+  
+  .payments-statuses-section .editable-field {
+    width: 100%;
+    text-align: left;
+  }
+  
+  .payments-statuses-section .auto-calculated {
+    width: 100%;
+    text-align: left;
+    align-items: flex-start;
+  }
+  
+  .payments-statuses-section .payment-input {
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .payments-statuses-section h3 {
+    font-size: 1.25rem;
+  }
+} 

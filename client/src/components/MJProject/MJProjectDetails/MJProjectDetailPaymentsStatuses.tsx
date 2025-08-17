@@ -26,16 +26,22 @@ interface MJProject {
 
 interface MJProjectDetailPaymentsStatusesProps {
   project: MJProject;
+  currentUser?: {
+    id: number;
+    username: string;
+    email: string;
+    is_admin?: boolean;
+  };
 }
 
-const MJProjectDetailPaymentsStatuses: React.FC<MJProjectDetailPaymentsStatusesProps> = ({ project }) => {
+const MJProjectDetailPaymentsStatuses: React.FC<MJProjectDetailPaymentsStatusesProps> = ({ project, currentUser }) => {
   const [purchaseCost, setPurchaseCost] = useState<number>(0);
   const [domesticShippingFee, setDomesticShippingFee] = useState<number>(0);
   const [commissionRate, setCommissionRate] = useState<number>(0);
   const [commission, setCommission] = useState<number>(0);
   const [totalPayment, setTotalPayment] = useState<number>(0);
 
-  // 구매원가 계산 (수량 × 견적가)
+  // 구매원가 계산 (수량 × 단가)
   useEffect(() => {
     const cost = (project.quantity || 0) * (project.price || 0);
     setPurchaseCost(cost);
@@ -95,34 +101,42 @@ const MJProjectDetailPaymentsStatuses: React.FC<MJProjectDetailPaymentsStatusesP
           <span className="info-label">구매원가:</span>
           <span className="info-value auto-calculated">
             {formatCurrency(purchaseCost)}
-            <span className="calculation-note">(수량 × 견적가)</span>
+            <span className="calculation-note">(수량 × 단가)</span>
           </span>
         </div>
         <div className="info-item">
           <span className="info-label">중국내 배송비:</span>
           <span className="info-value editable-field">
-            <input
-              type="number"
-              value={domesticShippingFee}
-              onChange={(e) => setDomesticShippingFee(Number(e.target.value) || 0)}
-              placeholder="배송비 입력"
-              className="payment-input"
-            />
+            {currentUser?.is_admin ? (
+              <input
+                type="number"
+                value={domesticShippingFee}
+                onChange={(e) => setDomesticShippingFee(Number(e.target.value) || 0)}
+                placeholder="배송비 입력"
+                className="payment-input"
+              />
+            ) : (
+              <span>{formatCurrency(domesticShippingFee)}</span>
+            )}
           </span>
         </div>
         <div className="info-item">
           <span className="info-label">수수료율:</span>
           <span className="info-value editable-field">
-            <input
-              type="number"
-              value={commissionRate}
-              onChange={(e) => setCommissionRate(Number(e.target.value) || 0)}
-              placeholder="수수료율 입력"
-              className="payment-input"
-              step="0.1"
-              min="0"
-              max="100"
-            />
+            {currentUser?.is_admin ? (
+              <input
+                type="number"
+                value={commissionRate}
+                onChange={(e) => setCommissionRate(Number(e.target.value) || 0)}
+                placeholder="수수료율 입력"
+                className="payment-input"
+                step="0.1"
+                min="0"
+                max="100"
+              />
+            ) : (
+              <span>{formatPercentage(commissionRate)}</span>
+            )}
           </span>
         </div>
         <div className="info-item">
@@ -145,15 +159,19 @@ const MJProjectDetailPaymentsStatuses: React.FC<MJProjectDetailPaymentsStatusesP
         </div>
         <div className="info-item quotation-approval">
           <span className="info-label">견적승인:</span>
-          <select 
-            value={project.quotation_approval || '승인 대기'} 
-            onChange={(e) => handleQuotationApprovalChange(e.target.value)}
-            className="quotation-select"
-          >
-            <option value="승인 대기">승인 대기</option>
-            <option value="승인됨">승인됨</option>
-            <option value="거절됨">거절됨</option>
-          </select>
+          {currentUser?.is_admin ? (
+            <select 
+              value={project.quotation_approval || '승인 대기'} 
+              onChange={(e) => handleQuotationApprovalChange(e.target.value)}
+              className="quotation-select"
+            >
+              <option value="승인 대기">승인 대기</option>
+              <option value="승인됨">승인됨</option>
+              <option value="거절됨">거절됨</option>
+            </select>
+          ) : (
+            <span className="info-value">{project.quotation_approval || '승인 대기'}</span>
+          )}
         </div>
       </div>
     </div>

@@ -33,9 +33,15 @@ interface MJProjectDetailProps {
   onClose: () => void;
   onEdit?: (project: MJProject) => void;
   onDelete?: (projectId: number) => void;
+  currentUser?: {
+    id: number;
+    username: string;
+    email: string;
+    is_admin?: boolean;
+  };
 }
 
-const MJProjectDetail: React.FC<MJProjectDetailProps> = ({ project, onClose, onEdit, onDelete }) => {
+const MJProjectDetail: React.FC<MJProjectDetailProps> = ({ project, onClose, onEdit, onDelete, currentUser }) => {
   const [editingPurchaseLink, setEditingPurchaseLink] = useState(false);
   const [purchaseLinkEdit, setPurchaseLinkEdit] = useState(project.purchase_link || '');
   const [savingLink, setSavingLink] = useState(false);
@@ -80,17 +86,17 @@ const MJProjectDetail: React.FC<MJProjectDetailProps> = ({ project, onClose, onE
     <div className="mj-project-detail">
       <MJProjectDetailHeader
         project={project}
-        onEdit={onEdit}
-        onDelete={onDelete}
+        onEdit={currentUser?.is_admin ? onEdit : undefined}
+        onDelete={currentUser?.is_admin ? onDelete : undefined}
         onClose={onClose}
       />
 
       <div className="detail-content">
-        <MJProjectDetailProjInfo project={project} />
+        <MJProjectDetailProjInfo project={project} currentUser={currentUser} />
 
-        <MJProjectDetailStatuses project={project} />
+        <MJProjectDetailStatuses project={project} currentUser={currentUser} />
 
-        <MJProjectDetailPaymentsStatuses project={project} />
+        <MJProjectDetailPaymentsStatuses project={project} currentUser={currentUser} />
 
 
 

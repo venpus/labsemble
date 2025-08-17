@@ -707,7 +707,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ currentUser }) => {
         )}
 
         {activeTab === 'mj-projects' && (
-          <MJProjectManagement users={users} />
+          <MJProjectManagement users={users} currentUser={currentUser} />
         )}
 
         {activeTab === 'work-status' && (

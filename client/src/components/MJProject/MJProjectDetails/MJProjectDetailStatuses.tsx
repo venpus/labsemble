@@ -26,9 +26,15 @@ interface MJProject {
 
 interface MJProjectDetailStatusesProps {
   project: MJProject;
+  currentUser?: {
+    id: number;
+    username: string;
+    email: string;
+    is_admin?: boolean;
+  };
 }
 
-const MJProjectDetailStatuses: React.FC<MJProjectDetailStatusesProps> = ({ project }) => {
+const MJProjectDetailStatuses: React.FC<MJProjectDetailStatusesProps> = ({ project, currentUser }) => {
   const formatDate = (dateString: string) => {
     if (!dateString) return '미정';
     const date = new Date(dateString);

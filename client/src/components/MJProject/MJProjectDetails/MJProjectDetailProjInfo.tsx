@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './MJProjectDetailProjInfo.css';
 
 interface MJProject {
@@ -26,20 +26,30 @@ interface MJProject {
 
 interface MJProjectDetailProjInfoProps {
   project: MJProject;
+  currentUser?: {
+    id: number;
+    username: string;
+    email: string;
+    is_admin?: boolean;
+  };
 }
 
-const MJProjectDetailProjInfo: React.FC<MJProjectDetailProjInfoProps> = ({ project }) => {
-  const [editingPurchaseLink, setEditingPurchaseLink] = useState(false);
+const MJProjectDetailProjInfo: React.FC<MJProjectDetailProjInfoProps> = ({ project, currentUser }) => {
   const [purchaseLinkEdit, setPurchaseLinkEdit] = useState(project.purchase_link || '');
   const [savingLink, setSavingLink] = useState(false);
   
-  const [editingQuantity, setEditingQuantity] = useState(false);
   const [quantityEdit, setQuantityEdit] = useState(project.quantity || 0);
   const [savingQuantity, setSavingQuantity] = useState(false);
   
-  const [editingPrice, setEditingPrice] = useState(false);
   const [priceEdit, setPriceEdit] = useState(project.price || 0);
   const [savingPrice, setSavingPrice] = useState(false);
+
+  // project 값이 변경될 때마다 입력 필드 값들을 동기화
+  useEffect(() => {
+    setPurchaseLinkEdit(project.purchase_link || '');
+    setQuantityEdit(project.quantity || 0);
+    setPriceEdit(project.price || 0);
+  }, [project.purchase_link, project.quantity, project.price]);
 
   const handleSavePurchaseLink = async () => {
     if (savingLink) return;
@@ -59,7 +69,6 @@ const MJProjectDetailProjInfo: React.FC<MJProjectDetailProjInfoProps> = ({ proje
       if (response.ok) {
         // 성공적으로 저장된 경우 프로젝트 객체 업데이트
         project.purchase_link = purchaseLinkEdit;
-        setEditingPurchaseLink(false);
         alert('구매링크가 성공적으로 저장되었습니다.');
       } else {
         const errorData = await response.json();
@@ -91,7 +100,6 @@ const MJProjectDetailProjInfo: React.FC<MJProjectDetailProjInfoProps> = ({ proje
       if (response.ok) {
         // 성공적으로 저장된 경우 프로젝트 객체 업데이트
         project.quantity = quantityEdit;
-        setEditingQuantity(false);
         alert('수량이 성공적으로 저장되었습니다.');
       } else {
         const errorData = await response.json();
@@ -123,15 +131,14 @@ const MJProjectDetailProjInfo: React.FC<MJProjectDetailProjInfoProps> = ({ proje
       if (response.ok) {
         // 성공적으로 저장된 경우 프로젝트 객체 업데이트
         project.price = priceEdit;
-        setEditingPrice(false);
-        alert('견적가가 성공적으로 저장되었습니다.');
+        alert('단가가 성공적으로 저장되었습니다.');
       } else {
         const errorData = await response.json();
-        alert(`견적가 저장에 실패했습니다: ${errorData.error || '알 수 없는 오류'}`);
+        alert(`단가 저장에 실패했습니다: ${errorData.error || '알 수 없는 오류'}`);
       }
     } catch (error) {
-      console.error('견적가 저장 오류:', error);
-      alert('견적가 저장 중 오류가 발생했습니다.');
+      console.error('단가 저장 오류:', error);
+      alert('단가 저장 중 오류가 발생했습니다.');
     } finally {
       setSavingPrice(false);
     }
@@ -148,91 +155,41 @@ const MJProjectDetailProjInfo: React.FC<MJProjectDetailProjInfoProps> = ({ proje
         <div className="info-item">
           <span className="info-label">수량:</span>
           <span className="info-value editable-field">
-            {editingQuantity ? (
+            {currentUser && (currentUser.is_admin || currentUser.id === project.user_id) ? (
               <div className="edit-container">
                 <input
                   type="number"
                   value={quantityEdit}
                   onChange={(e) => setQuantityEdit(Number(e.target.value) || 0)}
+                  onBlur={handleSaveQuantity}
                   placeholder="수량 입력"
                   className="info-input"
                   min="1"
                 />
-                <div className="edit-actions">
-                  <button 
-                    className="save-btn"
-                    onClick={handleSaveQuantity}
-                    disabled={savingQuantity}
-                  >
-                    {savingQuantity ? '저장 중...' : '저장'}
-                  </button>
-                  <button 
-                    className="cancel-btn"
-                    onClick={() => {
-                      setQuantityEdit(project.quantity || 0);
-                      setEditingQuantity(false);
-                    }}
-                  >
-                    취소
-                  </button>
-                </div>
               </div>
             ) : (
-              <div className="display-container">
-                <span>{project.quantity?.toLocaleString()}개</span>
-                <button 
-                  className="edit-btn"
-                  onClick={() => setEditingQuantity(true)}
-                >
-                  수정
-                </button>
-              </div>
+              <span>{project.quantity?.toLocaleString()}개</span>
             )}
           </span>
         </div>
-        <div className="info-item">
-          <span className="info-label">견적가:</span>
+                <div className="info-item">
+          <span className="info-label">단가:</span>
           <span className="info-value editable-field">
-            {editingPrice ? (
+            {currentUser?.is_admin ? (
               <div className="edit-container">
                 <input
                   type="number"
                   value={priceEdit}
                   onChange={(e) => setPriceEdit(Number(e.target.value) || 0)}
-                  placeholder="견적가 입력"
+                  onBlur={handleSavePrice}
+                  placeholder="단가 입력"
                   className="info-input"
                   min="0"
                   step="0.01"
                 />
-                <div className="edit-actions">
-                  <button 
-                    className="save-btn"
-                    onClick={handleSavePrice}
-                    disabled={savingPrice}
-                  >
-                    {savingPrice ? '저장 중...' : '저장'}
-                  </button>
-                  <button 
-                    className="cancel-btn"
-                    onClick={() => {
-                      setPriceEdit(project.price || 0);
-                      setEditingPrice(false);
-                    }}
-                  >
-                    취소
-                  </button>
-                </div>
               </div>
             ) : (
-              <div className="display-container">
-                <span>{project.price ? `¥${project.price.toLocaleString()}` : '미정'}</span>
-                <button 
-                  className="edit-btn"
-                  onClick={() => setEditingPrice(true)}
-                >
-                  수정
-                </button>
-              </div>
+              <span>{project.price ? `¥${project.price.toLocaleString()}` : '미정'}</span>
             )}
           </span>
         </div>
@@ -274,30 +231,16 @@ const MJProjectDetailProjInfo: React.FC<MJProjectDetailProjInfoProps> = ({ proje
         <div className="info-item full-width">
           <span className="info-label">구매 링크:</span>
           <span className="info-value">
-            {editingPurchaseLink ? (
+            {currentUser?.is_admin ? (
               <div className="edit-link-container">
                 <input
                   type="text"
                   value={purchaseLinkEdit}
                   onChange={(e) => setPurchaseLinkEdit(e.target.value)}
+                  onBlur={handleSavePurchaseLink}
                   className="link-edit-input"
                   placeholder="구매 링크를 입력하세요"
                 />
-                <div className="edit-actions">
-                  <button 
-                    className="save-link-btn"
-                    onClick={handleSavePurchaseLink}
-                    disabled={savingLink}
-                  >
-                    {savingLink ? '저장 중...' : '저장'}
-                  </button>
-                  <button 
-                    className="cancel-link-btn"
-                    onClick={() => setEditingPurchaseLink(false)}
-                  >
-                    취소
-                  </button>
-                </div>
               </div>
             ) : (
               <div className="link-display">
@@ -313,15 +256,6 @@ const MJProjectDetailProjInfo: React.FC<MJProjectDetailProjInfoProps> = ({ proje
                     <span className="link-icon">🔗</span>
                   </a>
                 ) : '없음'}
-                <button 
-                  className="edit-link-btn"
-                  onClick={() => {
-                    setPurchaseLinkEdit(project.purchase_link || '');
-                    setEditingPurchaseLink(true);
-                  }}
-                >
-                  수정
-                </button>
               </div>
             )}
           </span>

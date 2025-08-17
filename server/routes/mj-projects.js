@@ -203,6 +203,98 @@ router.patch('/:id/status', authenticateToken, async (req, res) => {
   }
 });
 
+// MJ 프로젝트 수량 수정 (일반 사용자와 Admin 모두 수정 가능)
+router.patch('/:id/quantity', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { quantity } = req.body;
+    const userId = req.user.id;
+
+    if (quantity === undefined || quantity < 1) {
+      return res.status(400).json({ error: '유효한 수량이 필요합니다.' });
+    }
+
+    const connection = await pool.getConnection();
+    
+    // 프로젝트가 해당 사용자의 것인지 확인 (자신의 프로젝트만 수정 가능)
+    const [projectCheck] = await connection.execute(
+      'SELECT user_id FROM mj_projects WHERE id = ?',
+      [id]
+    );
+
+    if (projectCheck.length === 0) {
+      connection.release();
+      return res.status(404).json({ error: '프로젝트를 찾을 수 없습니다.' });
+    }
+
+    // Admin이거나 프로젝트 소유자인 경우에만 수정 가능
+    if (!req.user.is_admin && projectCheck[0].user_id !== userId) {
+      connection.release();
+      return res.status(403).json({ error: '수량을 수정할 권한이 없습니다.' });
+    }
+    
+    await connection.execute(
+      'UPDATE mj_projects SET quantity = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [quantity, id]
+    );
+
+    connection.release();
+
+    res.json({
+      success: true,
+      message: '수량이 성공적으로 수정되었습니다.'
+    });
+  } catch (error) {
+    console.error('수량 수정 오류:', error);
+    res.status(500).json({ error: '수량 수정에 실패했습니다.' });
+  }
+});
+
+// MJ 프로젝트 단가 수정 (Admin 사용자만 수정 가능)
+router.patch('/:id/price', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { price } = req.body;
+
+    // Admin 권한 확인
+    if (!req.user.is_admin) {
+      return res.status(403).json({ error: '단가를 수정할 권한이 없습니다. Admin 권한이 필요합니다.' });
+    }
+
+    if (price === undefined || price < 0) {
+      return res.status(400).json({ error: '유효한 단가가 필요합니다.' });
+    }
+
+    const connection = await pool.getConnection();
+    
+    // 프로젝트 존재 여부 확인
+    const [projectCheck] = await connection.execute(
+      'SELECT id FROM mj_projects WHERE id = ?',
+      [id]
+    );
+
+    if (projectCheck.length === 0) {
+      connection.release();
+      return res.status(404).json({ error: '프로젝트를 찾을 수 없습니다.' });
+    }
+    
+    await connection.execute(
+      'UPDATE mj_projects SET price = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [price, id]
+    );
+
+    connection.release();
+
+    res.json({
+      success: true,
+      message: '단가가 성공적으로 수정되었습니다.'
+    });
+  } catch (error) {
+    console.error('단가 수정 오류:', error);
+    res.status(500).json({ error: '단가 수정에 실패했습니다.' });
+  }
+});
+
 // MJ 프로젝트 견적승인 상태 변경
 router.patch('/:id/quotation-approval', authenticateToken, async (req, res) => {
   try {

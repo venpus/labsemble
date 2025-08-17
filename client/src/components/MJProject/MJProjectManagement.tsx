@@ -34,9 +34,15 @@ interface MJProjectManagementProps {
     is_admin?: boolean;
     created_at: string;
   }>;
+  currentUser?: {
+    id: number;
+    username: string;
+    email: string;
+    is_admin?: boolean;
+  };
 }
 
-const MJProjectManagement: React.FC<MJProjectManagementProps> = ({ users }) => {
+const MJProjectManagement: React.FC<MJProjectManagementProps> = ({ users, currentUser }) => {
   const [mjProjects, setMjProjects] = useState<MJProject[]>([]);
   const [error, setError] = useState('');
   const [showDetail, setShowDetail] = useState(false);
@@ -137,6 +143,7 @@ const MJProjectManagement: React.FC<MJProjectManagementProps> = ({ users }) => {
         isAdmin={users.some(user => user.is_admin)}
         showDetail={showDetail}
         setShowDetail={setShowDetail}
+        currentUser={currentUser}
       />
     </div>
   );

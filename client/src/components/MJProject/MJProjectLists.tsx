@@ -29,11 +29,17 @@ interface MJProjectListsProps {
   isAdmin?: boolean;
   showDetail?: boolean;
   setShowDetail?: (show: boolean) => void;
+  currentUser?: {
+    id: number;
+    username: string;
+    email: string;
+    is_admin?: boolean;
+  };
 }
 
 
 
-const MJProjectLists: React.FC<MJProjectListsProps> = ({ mjProjects, isAdmin = false, showDetail: externalShowDetail, setShowDetail: externalSetShowDetail }) => {
+const MJProjectLists: React.FC<MJProjectListsProps> = ({ mjProjects, isAdmin = false, showDetail: externalShowDetail, setShowDetail: externalSetShowDetail, currentUser }) => {
   const [appliedFilters, setAppliedFilters] = useState<SearchFilters>({
     user: '',
     company: '',
@@ -220,6 +226,7 @@ const MJProjectLists: React.FC<MJProjectListsProps> = ({ mjProjects, isAdmin = f
               onClose={handleCloseDetail}
               onEdit={handleEditProject}
               onDelete={handleDeleteProject}
+              currentUser={currentUser}
             />
           </div>
         </div>
@@ -245,7 +252,7 @@ const MJProjectLists: React.FC<MJProjectListsProps> = ({ mjProjects, isAdmin = f
                 <th style={{ textAlign: 'center' }}>사진</th>
                 <th style={{ textAlign: 'center' }}>상품명</th>
                 <th style={{ textAlign: 'center' }}>수량</th>
-                <th style={{ textAlign: 'center' }}>견적가</th>
+                <th style={{ textAlign: 'center' }}>단가</th>
                 <th style={{ textAlign: 'center' }}>상태</th>
                 <th style={{ textAlign: 'center' }}>결제</th>
                 <th style={{ textAlign: 'center' }}>배송</th>

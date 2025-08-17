@@ -118,6 +118,11 @@ router.get('/', authenticateToken, async (req, res) => {
         mp.payment_status,
         mp.delivery_status,
         mp.expected_shipping_date,
+        mp.production_days,
+        mp.logistic_cost,
+        mp.commission_rate,
+        mp.commission,
+        mp.total_payment,
         mp.project_code,
         mp.quotation_approval,
         mp.created_at,
@@ -210,6 +215,9 @@ router.patch('/:id/quantity', authenticateToken, async (req, res) => {
     const { quantity } = req.body;
     const userId = req.user.id;
 
+    console.log('수량 수정 시도 - 사용자 정보:', req.user);
+    console.log('프로젝트 ID:', id, '수량:', quantity);
+
     if (quantity === undefined || quantity < 1) {
       return res.status(400).json({ error: '유효한 수량이 필요합니다.' });
     }
@@ -226,6 +234,10 @@ router.patch('/:id/quantity', authenticateToken, async (req, res) => {
       connection.release();
       return res.status(404).json({ error: '프로젝트를 찾을 수 없습니다.' });
     }
+
+    console.log('프로젝트 소유자 ID:', projectCheck[0].user_id);
+    console.log('현재 사용자 ID:', userId);
+    console.log('Admin 여부:', req.user.is_admin);
 
     // Admin이거나 프로젝트 소유자인 경우에만 수정 가능
     if (!req.user.is_admin && projectCheck[0].user_id !== userId) {
@@ -257,6 +269,10 @@ router.patch('/:id/price', authenticateToken, async (req, res) => {
     const { price } = req.body;
 
     // Admin 권한 확인
+    console.log('단가 수정 시도 - 사용자 정보:', req.user);
+    console.log('프로젝트 ID:', id, '단가:', price);
+    console.log('Admin 여부:', req.user.is_admin);
+    
     if (!req.user.is_admin) {
       return res.status(403).json({ error: '단가를 수정할 권한이 없습니다. Admin 권한이 필요합니다.' });
     }
@@ -321,6 +337,542 @@ router.patch('/:id/quotation-approval', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error('견적승인 상태 변경 오류:', error);
     res.status(500).json({ error: '견적승인 상태 변경에 실패했습니다.' });
+  }
+});
+
+// MJ 프로젝트 출고 예정일 수정 (Admin 사용자만 수정 가능)
+router.patch('/:id/expected-shipping-date', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { expected_shipping_date } = req.body;
+
+    // Admin 권한 확인
+    console.log('출고 예정일 수정 시도 - 사용자 정보:', req.user);
+    if (!req.user.is_admin) {
+      return res.status(403).json({ error: '출고 예정일을 수정할 권한이 없습니다. Admin 권한이 필요합니다.' });
+    }
+
+    const connection = await pool.getConnection();
+    
+    // 프로젝트 존재 여부 확인
+    const [projectCheck] = await connection.execute(
+      'SELECT id FROM mj_projects WHERE id = ?',
+      [id]
+    );
+
+    if (projectCheck.length === 0) {
+      connection.release();
+      return res.status(404).json({ error: '프로젝트를 찾을 수 없습니다.' });
+    }
+    
+    // 빈 문자열이나 null이면 NULL로 설정, 그렇지 않으면 날짜 값 사용
+    const dateValue = (!expected_shipping_date || expected_shipping_date === '') ? null : expected_shipping_date;
+    
+    await connection.execute(
+      'UPDATE mj_projects SET expected_shipping_date = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [dateValue, id]
+    );
+
+    connection.release();
+
+    res.json({
+      success: true,
+      message: '출고 예정일이 성공적으로 수정되었습니다.'
+    });
+  } catch (error) {
+    console.error('출고 예정일 수정 오류:', error);
+    res.status(500).json({ error: '출고 예정일 수정에 실패했습니다.' });
+  }
+});
+
+// MJ 프로젝트 출고 상태 수정 (Admin 사용자만 수정 가능)
+router.patch('/:id/delivery-status', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { delivery_status } = req.body;
+
+    // Admin 권한 확인
+    console.log('출고 상태 수정 시도 - 사용자 정보:', req.user);
+    if (!req.user.is_admin) {
+      return res.status(403).json({ error: '출고 상태를 수정할 권한이 없습니다. Admin 권한이 필요합니다.' });
+    }
+
+    if (!delivery_status) {
+      return res.status(400).json({ error: '출고 상태가 필요합니다.' });
+    }
+
+    const connection = await pool.getConnection();
+    
+    // 프로젝트 존재 여부 확인
+    const [projectCheck] = await connection.execute(
+      'SELECT id FROM mj_projects WHERE id = ?',
+      [id]
+    );
+
+    if (projectCheck.length === 0) {
+      connection.release();
+      return res.status(404).json({ error: '프로젝트를 찾을 수 없습니다.' });
+    }
+    
+    await connection.execute(
+      'UPDATE mj_projects SET delivery_status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [delivery_status, id]
+    );
+
+    connection.release();
+
+    res.json({
+      success: true,
+      message: '출고 상태가 성공적으로 수정되었습니다.'
+    });
+  } catch (error) {
+    console.error('출고 상태 수정 오류:', error);
+    res.status(500).json({ error: '출고 상태 수정에 실패했습니다.' });
+  }
+});
+
+// MJ 프로젝트 구매 링크 수정 (Admin 사용자만 수정 가능)
+router.patch('/:id/purchase-link', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { purchaseLink } = req.body;
+
+    // Admin 권한 확인
+    console.log('구매 링크 수정 시도 - 사용자 정보:', req.user);
+    if (!req.user.is_admin) {
+      return res.status(403).json({ error: '구매 링크를 수정할 권한이 없습니다. Admin 권한이 필요합니다.' });
+    }
+
+    const connection = await pool.getConnection();
+    
+    // 프로젝트 존재 여부 확인
+    const [projectCheck] = await connection.execute(
+      'SELECT id FROM mj_projects WHERE id = ?',
+      [id]
+    );
+
+    if (projectCheck.length === 0) {
+      connection.release();
+      return res.status(404).json({ error: '프로젝트를 찾을 수 없습니다.' });
+    }
+    
+    await connection.execute(
+      'UPDATE mj_projects SET purchase_link = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [purchaseLink, id]
+    );
+
+    connection.release();
+
+    res.json({
+      success: true,
+      message: '구매 링크가 성공적으로 수정되었습니다.'
+    });
+  } catch (error) {
+    console.error('구매 링크 수정 오류:', error);
+    res.status(500).json({ error: '구매 링크 수정에 실패했습니다.' });
+  }
+});
+
+// MJ 프로젝트 생산소요일 수정 (Admin 사용자만 수정 가능)
+router.patch('/:id/production-days', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { production_days } = req.body;
+
+    // Admin 권한 확인
+    console.log('생산소요일 수정 시도 - 사용자 정보:', req.user);
+    if (!req.user.is_admin) {
+      return res.status(403).json({ error: '생산소요일을 수정할 권한이 없습니다. Admin 권한이 필요합니다.' });
+    }
+
+    const connection = await pool.getConnection();
+    
+    // 프로젝트 존재 여부 확인
+    const [projectCheck] = await connection.execute(
+      'SELECT id FROM mj_projects WHERE id = ?',
+      [id]
+    );
+
+    if (projectCheck.length === 0) {
+      connection.release();
+      return res.status(404).json({ error: '프로젝트를 찾을 수 없습니다.' });
+    }
+    
+    await connection.execute(
+      'UPDATE mj_projects SET production_days = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [production_days, id]
+    );
+
+    connection.release();
+
+    res.json({
+      success: true,
+      message: '생산소요일이 성공적으로 수정되었습니다.'
+    });
+  } catch (error) {
+    console.error('생산소요일 수정 오류:', error);
+    res.status(500).json({ error: '생산소요일 수정에 실패했습니다.' });
+  }
+});
+
+// MJ 프로젝트 logistic_cost 수정 (Admin 사용자만 수정 가능)
+router.patch('/:id/logistic-cost', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { logistic_cost } = req.body;
+
+    // Admin 권한 확인
+    console.log('logistic_cost 수정 시도 - 사용자 정보:', req.user);
+    if (!req.user.is_admin) {
+      return res.status(403).json({ error: 'logistic_cost를 수정할 권한이 없습니다. Admin 권한이 필요합니다.' });
+    }
+
+    const connection = await pool.getConnection();
+    
+    // 프로젝트 존재 여부 확인
+    const [projectCheck] = await connection.execute(
+      'SELECT id FROM mj_projects WHERE id = ?',
+      [id]
+    );
+
+    if (projectCheck.length === 0) {
+      connection.release();
+      return res.status(404).json({ error: '프로젝트를 찾을 수 없습니다.' });
+    }
+    
+    await connection.execute(
+      'UPDATE mj_projects SET logistic_cost = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [logistic_cost, id]
+    );
+
+    connection.release();
+
+    res.json({
+      success: true,
+      message: 'logistic_cost가 성공적으로 수정되었습니다.'
+    });
+  } catch (error) {
+    console.error('logistic_cost 수정 오류:', error);
+    res.status(500).json({ error: 'logistic_cost 수정에 실패했습니다.' });
+  }
+});
+
+// MJ 프로젝트 commission_rate 수정 (Admin 사용자만 수정 가능)
+router.patch('/:id/commission-rate', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { commission_rate } = req.body;
+
+    // Admin 권한 확인
+    console.log('commission_rate 수정 시도 - 사용자 정보:', req.user);
+    if (!req.user.is_admin) {
+      return res.status(403).json({ error: 'commission_rate를 수정할 권한이 없습니다. Admin 권한이 필요합니다.' });
+    }
+
+    const connection = await pool.getConnection();
+    
+    // 프로젝트 존재 여부 확인
+    const [projectCheck] = await connection.execute(
+      'SELECT id FROM mj_projects WHERE id = ?',
+      [id]
+    );
+
+    if (projectCheck.length === 0) {
+      connection.release();
+      return res.status(404).json({ error: '프로젝트를 찾을 수 없습니다.' });
+    }
+    
+    await connection.execute(
+      'UPDATE mj_projects SET commission_rate = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [commission_rate, id]
+    );
+
+    connection.release();
+
+    res.json({
+      success: true,
+      message: 'commission_rate가 성공적으로 수정되었습니다.'
+    });
+  } catch (error) {
+    console.error('commission_rate 수정 오류:', error);
+    res.status(500).json({ error: 'commission_rate 수정에 실패했습니다.' });
+  }
+});
+
+// MJ 프로젝트 commission 수정 (Admin 사용자만 수정 가능)
+router.patch('/:id/commission', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { commission } = req.body;
+
+    // Admin 권한 확인
+    console.log('commission 수정 시도 - 사용자 정보:', req.user);
+    if (!req.user.is_admin) {
+      return res.status(403).json({ error: 'commission을 수정할 권한이 없습니다. Admin 권한이 필요합니다.' });
+    }
+
+    const connection = await pool.getConnection();
+    
+    // 프로젝트 존재 여부 확인
+    const [projectCheck] = await connection.execute(
+      'SELECT id FROM mj_projects WHERE id = ?',
+      [id]
+    );
+
+    if (projectCheck.length === 0) {
+      connection.release();
+      return res.status(404).json({ error: '프로젝트를 찾을 수 없습니다.' });
+    }
+    
+    await connection.execute(
+      'UPDATE mj_projects SET commission = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [commission, id]
+    );
+
+    connection.release();
+
+    res.json({
+      success: true,
+      message: 'commission이 성공적으로 수정되었습니다.'
+    });
+  } catch (error) {
+    console.error('commission 수정 오류:', error);
+    res.status(500).json({ error: 'commission 수정에 실패했습니다.' });
+  }
+});
+
+// MJ 프로젝트 total_payment 수정 (Admin 사용자만 수정 가능)
+router.patch('/:id/total-payment', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { total_payment } = req.body;
+
+    // Admin 권한 확인
+    console.log('total_payment 수정 시도 - 사용자 정보:', req.user);
+    console.log('요청된 total_payment 값:', total_payment);
+    console.log('total_payment 타입:', typeof total_payment);
+    
+    if (!req.user.is_admin) {
+      return res.status(403).json({ error: 'total_payment를 수정할 권한이 없습니다. Admin 권한이 필요합니다.' });
+    }
+
+    // 값 검증
+    if (total_payment === undefined || total_payment === null) {
+      return res.status(400).json({ error: 'total_payment 값이 제공되지 않았습니다.' });
+    }
+
+    const numericTotal = Number(total_payment);
+    if (isNaN(numericTotal)) {
+      return res.status(400).json({ error: 'total_payment는 유효한 숫자여야 합니다.' });
+    }
+
+    console.log('검증된 total_payment 값:', numericTotal);
+
+    const connection = await pool.getConnection();
+    
+    // 프로젝트 존재 여부 확인
+    const [projectCheck] = await connection.execute(
+      'SELECT id FROM mj_projects WHERE id = ?',
+      [id]
+    );
+
+    if (projectCheck.length === 0) {
+      connection.release();
+      return res.status(404).json({ error: '프로젝트를 찾을 수 없습니다.' });
+    }
+    
+    console.log('DB 업데이트 실행:', numericTotal, id);
+    await connection.execute(
+      'UPDATE mj_projects SET total_payment = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [numericTotal, id]
+    );
+
+    connection.release();
+
+    console.log('total_payment 업데이트 성공');
+    res.json({
+      success: true,
+      message: 'total_payment가 성공적으로 수정되었습니다.'
+    });
+  } catch (error) {
+    console.error('total_payment 수정 오류:', error);
+    console.error('오류 코드:', error.code);
+    console.error('오류 메시지:', error.message);
+    res.status(500).json({ 
+      error: 'total_payment 수정에 실패했습니다.',
+      details: error.message 
+    });
+  }
+});
+
+// 미디어 파일 업로드를 위한 Multer 설정
+const mediaStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = path.join(__dirname, '../uploads/mj-projects');
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    const timestamp = Date.now();
+    const randomId = Math.floor(Math.random() * 1000000000);
+    const ext = path.extname(file.originalname);
+    cb(null, `mj-project-${timestamp}-${randomId}${ext}`);
+  }
+});
+
+const mediaUpload = multer({
+  storage: mediaStorage,
+  limits: {
+    fileSize: 50 * 1024 * 1024, // 50MB 제한
+    files: 10 // 최대 10개 파일
+  },
+  fileFilter: (req, file, cb) => {
+    // 이미지 및 비디오 파일만 허용
+    const allowedTypes = /jpeg|jpg|png|gif|bmp|webp|mp4|avi|mov|wmv|flv|webm/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error('지원하지 않는 파일 형식입니다.'));
+    }
+  }
+});
+
+// MJ 프로젝트 미디어 업로드 (Admin 사용자만)
+router.post('/:id/media', authenticateToken, mediaUpload.array('media', 10), async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Admin 권한 확인
+    if (!req.user.is_admin) {
+      return res.status(403).json({ error: '미디어 업로드 권한이 없습니다. Admin 권한이 필요합니다.' });
+    }
+
+    const connection = await pool.getConnection();
+    
+    // 프로젝트 존재 여부 확인
+    const [projectCheck] = await connection.execute(
+      'SELECT id, image_paths FROM mj_projects WHERE id = ?',
+      [id]
+    );
+
+    if (projectCheck.length === 0) {
+      connection.release();
+      return res.status(404).json({ error: '프로젝트를 찾을 수 없습니다.' });
+    }
+
+    // 기존 이미지 경로 가져오기
+    let existingPaths = [];
+    if (projectCheck[0].image_paths) {
+      try {
+        existingPaths = JSON.parse(projectCheck[0].image_paths);
+      } catch (e) {
+        existingPaths = [];
+      }
+    }
+
+    // 새로 업로드된 파일들 추가
+    const newFiles = req.files ? req.files.map(file => file.filename) : [];
+    const updatedPaths = [...existingPaths, ...newFiles];
+
+    // 최대 10개 제한 확인
+    if (updatedPaths.length > 10) {
+      connection.release();
+      return res.status(400).json({ error: '최대 10개까지 업로드할 수 있습니다.' });
+    }
+
+    // 데이터베이스 업데이트
+    await connection.execute(
+      'UPDATE mj_projects SET image_paths = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [JSON.stringify(updatedPaths), id]
+    );
+
+    connection.release();
+
+    res.json({
+      success: true,
+      message: '미디어 파일이 성공적으로 업로드되었습니다.',
+      uploadedFiles: newFiles,
+      totalFiles: updatedPaths.length
+    });
+  } catch (error) {
+    console.error('미디어 업로드 오류:', error);
+    
+    if (error.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ error: '파일 크기가 너무 큽니다. 50MB 이하의 파일만 업로드 가능합니다.' });
+    }
+    
+    if (error.code === 'LIMIT_FILE_COUNT') {
+      return res.status(400).json({ error: '업로드할 수 있는 파일 수를 초과했습니다. 최대 10개까지 업로드 가능합니다.' });
+    }
+    
+    res.status(500).json({ error: '미디어 업로드에 실패했습니다.' });
+  }
+});
+
+// MJ 프로젝트 미디어 삭제 (Admin 사용자만)
+router.delete('/:id/media', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { mediaPath } = req.body;
+    
+    // Admin 권한 확인
+    if (!req.user.is_admin) {
+      return res.status(403).json({ error: '미디어 삭제 권한이 없습니다. Admin 권한이 필요합니다.' });
+    }
+
+    const connection = await pool.getConnection();
+    
+    // 프로젝트 존재 여부 확인
+    const [projectCheck] = await connection.execute(
+      'SELECT id, image_paths FROM mj_projects WHERE id = ?',
+      [id]
+    );
+
+    if (projectCheck.length === 0) {
+      connection.release();
+      return res.status(404).json({ error: '프로젝트를 찾을 수 없습니다.' });
+    }
+
+    // 기존 이미지 경로 가져오기
+    let existingPaths = [];
+    if (projectCheck[0].image_paths) {
+      try {
+        existingPaths = JSON.parse(projectCheck[0].image_paths);
+      } catch (e) {
+        existingPaths = [];
+      }
+    }
+
+    // 삭제할 파일 경로 제거
+    const updatedPaths = existingPaths.filter(path => path !== mediaPath);
+
+    // 데이터베이스 업데이트
+    await connection.execute(
+      'UPDATE mj_projects SET image_paths = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [JSON.stringify(updatedPaths), id]
+    );
+
+    // 실제 파일 삭제
+    try {
+      const filePath = path.join(__dirname, '../uploads/mj-projects', mediaPath);
+      await fs.unlink(filePath);
+    } catch (fileError) {
+      console.error('파일 삭제 실패:', fileError);
+      // 파일 삭제 실패해도 데이터베이스는 업데이트됨
+    }
+
+    connection.release();
+
+    res.json({
+      success: true,
+      message: '미디어 파일이 성공적으로 삭제되었습니다.',
+      totalFiles: updatedPaths.length
+    });
+  } catch (error) {
+    console.error('미디어 삭제 오류:', error);
+    res.status(500).json({ error: '미디어 삭제에 실패했습니다.' });
   }
 });
 

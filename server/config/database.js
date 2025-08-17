@@ -184,6 +184,50 @@ async function initializeDatabase() {
        // 컬럼이 이미 존재하는 경우 무시
      }
 
+     // 기존 테이블에 생산소요일 컬럼 추가 (이미 존재하는 경우 무시)
+     try {
+       await connection.execute('ALTER TABLE mj_projects ADD COLUMN production_days INT');
+     } catch (error) {
+       // 컬럼이 이미 존재하는 경우 무시
+     }
+
+     // 기존 테이블에 logistic_cost 컬럼 추가 (이미 존재하는 경우 무시)
+     try {
+       await connection.execute('ALTER TABLE mj_projects ADD COLUMN logistic_cost DECIMAL(10,2)');
+     } catch (error) {
+       // 컬럼이 이미 존재하는 경우 무시
+     }
+
+     // 기존 테이블에 commission_rate 컬럼 추가 (이미 존재하는 경우 무시)
+     try {
+       await connection.execute('ALTER TABLE mj_projects ADD COLUMN commission_rate DECIMAL(3,1) DEFAULT 0.0');
+     } catch (error) {
+       // 컬럼이 이미 존재하는 경우 무시
+     }
+
+     // 기존 테이블에 commission 컬럼 추가 (이미 존재하는 경우 무시)
+     try {
+       await connection.execute('ALTER TABLE mj_projects ADD COLUMN commission DECIMAL(10,2) DEFAULT 0.0');
+     } catch (error) {
+       // 컬럼이 이미 존재하는 경우 무시
+     }
+
+     // 기존 테이블에 total_payment 컬럼 추가 (이미 존재하는 경우 무시)
+     try {
+       await connection.execute('ALTER TABLE mj_projects ADD COLUMN total_payment DECIMAL(15,2) DEFAULT 0.0');
+     } catch (error) {
+       // 컬럼이 이미 존재하는 경우 무시
+     }
+
+     // 기존 total_payment 컬럼 크기 확장 (이미 존재하는 경우)
+     try {
+       await connection.execute('ALTER TABLE mj_projects MODIFY COLUMN total_payment DECIMAL(15,2) DEFAULT 0.0');
+     } catch (error) {
+       // 컬럼이 존재하지 않는 경우 무시
+     }
+
+
+
 
     connection.release();
   } catch (error) {

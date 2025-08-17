@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiService } from '../../../services/api';
 import './MJProjectDetailProjInfo.css';
 
 interface MJProject {
@@ -56,27 +57,14 @@ const MJProjectDetailProjInfo: React.FC<MJProjectDetailProjInfoProps> = ({ proje
     
     try {
       setSavingLink(true);
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/mj-projects/${project.id}/purchase-link`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ purchaseLink: purchaseLinkEdit })
-      });
-
-      if (response.ok) {
-        // 성공적으로 저장된 경우 프로젝트 객체 업데이트
-        project.purchase_link = purchaseLinkEdit;
-        alert('구매링크가 성공적으로 저장되었습니다.');
-      } else {
-        const errorData = await response.json();
-        alert(`구매링크 저장에 실패했습니다: ${errorData.error || '알 수 없는 오류'}`);
-      }
-    } catch (error) {
+      await apiService.updateMJProjectPurchaseLink(project.id, purchaseLinkEdit);
+      // 성공적으로 저장된 경우 프로젝트 객체 업데이트
+      project.purchase_link = purchaseLinkEdit;
+      // 성공 시에는 팝업 메시지 없이 조용히 처리
+    } catch (error: any) {
       console.error('구매링크 저장 오류:', error);
-      alert('구매링크 저장 중 오류가 발생했습니다.');
+      const errorMessage = error.response?.data?.error || '구매링크 저장 중 오류가 발생했습니다.';
+      alert(`구매링크 저장 실패: ${errorMessage}`);
     } finally {
       setSavingLink(false);
     }
@@ -85,29 +73,20 @@ const MJProjectDetailProjInfo: React.FC<MJProjectDetailProjInfoProps> = ({ proje
   const handleSaveQuantity = async () => {
     if (savingQuantity) return;
     
+    console.log('수량 저장 시도 - 현재 사용자:', currentUser);
+    console.log('프로젝트 정보:', project);
+    console.log('수량 수정 값:', quantityEdit);
+    
     try {
       setSavingQuantity(true);
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/mj-projects/${project.id}/quantity`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ quantity: quantityEdit })
-      });
-
-      if (response.ok) {
-        // 성공적으로 저장된 경우 프로젝트 객체 업데이트
-        project.quantity = quantityEdit;
-        alert('수량이 성공적으로 저장되었습니다.');
-      } else {
-        const errorData = await response.json();
-        alert(`수량 저장에 실패했습니다: ${errorData.error || '알 수 없는 오류'}`);
-      }
-    } catch (error) {
+      await apiService.updateMJProjectQuantity(project.id, quantityEdit);
+      // 성공적으로 저장된 경우 프로젝트 객체 업데이트
+      project.quantity = quantityEdit;
+      // 성공 시에는 팝업 메시지 없이 조용히 처리
+    } catch (error: any) {
       console.error('수량 저장 오류:', error);
-      alert('수량 저장 중 오류가 발생했습니다.');
+      const errorMessage = error.response?.data?.error || '수량 저장 중 오류가 발생했습니다.';
+      alert(`수량 저장 실패: ${errorMessage}`);
     } finally {
       setSavingQuantity(false);
     }
@@ -116,29 +95,20 @@ const MJProjectDetailProjInfo: React.FC<MJProjectDetailProjInfoProps> = ({ proje
   const handleSavePrice = async () => {
     if (savingPrice) return;
     
+    console.log('단가 저장 시도 - 현재 사용자:', currentUser);
+    console.log('프로젝트 정보:', currentUser);
+    console.log('단가 수정 값:', priceEdit);
+    
     try {
       setSavingPrice(true);
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/mj-projects/${project.id}/price`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ price: priceEdit })
-      });
-
-      if (response.ok) {
-        // 성공적으로 저장된 경우 프로젝트 객체 업데이트
-        project.price = priceEdit;
-        alert('단가가 성공적으로 저장되었습니다.');
-      } else {
-        const errorData = await response.json();
-        alert(`단가 저장에 실패했습니다: ${errorData.error || '알 수 없는 오류'}`);
-      }
-    } catch (error) {
+      await apiService.updateMJProjectPrice(project.id, priceEdit);
+      // 성공적으로 저장된 경우 프로젝트 객체 업데이트
+      project.price = priceEdit;
+      // 성공 시에는 팝업 메시지 없이 조용히 처리
+    } catch (error: any) {
       console.error('단가 저장 오류:', error);
-      alert('단가 저장 중 오류가 발생했습니다.');
+      const errorMessage = error.response?.data?.error || '단가 저장 중 오류가 발생했습니다.';
+      alert(`단가 저장 실패: ${errorMessage}`);
     } finally {
       setSavingPrice(false);
     }
@@ -152,7 +122,7 @@ const MJProjectDetailProjInfo: React.FC<MJProjectDetailProjInfoProps> = ({ proje
           <span className="info-label">상품명:</span>
           <span className="info-value">{project.product_name}</span>
         </div>
-        <div className="info-item">
+        <div className="info-item has-input">
           <span className="info-label">수량:</span>
           <span className="info-value editable-field">
             {currentUser && (currentUser.is_admin || currentUser.id === project.user_id) ? (
@@ -172,7 +142,7 @@ const MJProjectDetailProjInfo: React.FC<MJProjectDetailProjInfoProps> = ({ proje
             )}
           </span>
         </div>
-                <div className="info-item">
+        <div className="info-item has-input">
           <span className="info-label">단가:</span>
           <span className="info-value editable-field">
             {currentUser?.is_admin ? (
@@ -228,7 +198,7 @@ const MJProjectDetailProjInfo: React.FC<MJProjectDetailProjInfoProps> = ({ proje
         </div>
         
         {/* 구매 링크를 별도 줄에 표시 (수정 가능) */}
-        <div className="info-item full-width">
+        <div className="info-item full-width has-input">
           <span className="info-label">구매 링크:</span>
           <span className="info-value">
             {currentUser?.is_admin ? (
@@ -245,16 +215,31 @@ const MJProjectDetailProjInfo: React.FC<MJProjectDetailProjInfoProps> = ({ proje
             ) : (
               <div className="link-display">
                 {project.purchase_link ? (
-                  <a 
-                    href={project.purchase_link} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="purchase-link clickable-link"
-                    title="클릭하여 새 탭에서 구매 링크 열기"
-                  >
-                    {project.purchase_link}
-                    <span className="link-icon">🔗</span>
-                  </a>
+                  <div className="link-with-actions">
+                    <a 
+                      href={project.purchase_link} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="purchase-link clickable-link"
+                      title="클릭하여 새 탭에서 구매 링크 열기"
+                    >
+                      {project.purchase_link}
+                      <span className="link-icon">🔗</span>
+                    </a>
+                    <button
+                      type="button"
+                      className="copy-link-btn"
+                      onClick={() => {
+                        if (project.purchase_link) {
+                          navigator.clipboard.writeText(project.purchase_link);
+                          // 복사 성공 피드백 (선택사항)
+                        }
+                      }}
+                      title="링크 복사"
+                    >
+                      📋
+                    </button>
+                  </div>
                 ) : '없음'}
               </div>
             )}

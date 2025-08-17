@@ -1,0 +1,280 @@
+/* 납기 정보 섹션 */
+.delivery-info-section {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 0.1rem;
+}
+
+.delivery-info-section h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.delivery-info-section .info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.delivery-info-section .info-grid:last-child {
+  margin-bottom: 0;
+}
+
+.delivery-info-section .info-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.delivery-info-section .info-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(59, 130, 246, 0.3);
+  transform: translateY(-2px);
+}
+
+.delivery-info-section .info-label {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.delivery-info-section .info-value {
+  color: white;
+  flex: 1;
+}
+
+/* 수정 가능한 영역 스타일 */
+.delivery-info-section .editable-field {
+  background: linear-gradient(135deg, #ff8c00, #ff6b35);
+  padding: 0.5rem 0.5rem 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(255, 140, 0, 0.3);
+  border: 1px solid #ff8c00;
+  transition: all 0.3s ease;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+}
+
+.delivery-info-section .editable-field:hover {
+  background: linear-gradient(135deg, #ff6b35, #ff8c00);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(255, 140, 0, 0.4);
+}
+
+/* 출고 상태 - 기본 스타일 */
+.delivery-info-section .status-field {
+  padding: 0.5rem 0.5rem 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+  color: white;
+}
+
+/* 출고 상태별 스타일 */
+
+/* 검토중 - 회색 */
+.delivery-info-section .status-field.status-review {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+  box-shadow: 0 2px 4px rgba(107, 114, 128, 0.3);
+  border: 1px solid #6b7280;
+}
+
+.delivery-info-section .status-field.status-review:hover {
+  background: linear-gradient(135deg, #4b5563, #6b7280);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(107, 114, 128, 0.4);
+}
+
+/* 출고대기 - 초록색 (성공) */
+.delivery-info-section .status-field.status-waiting {
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+  border: 1px solid #10b981;
+}
+
+.delivery-info-section .status-field.status-waiting:hover {
+  background: linear-gradient(135deg, #059669, #10b981);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4);
+}
+
+/* 출고연기 - 주황색 (경고) */
+.delivery-info-section .status-field.status-delayed {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+  border: 1px solid #f59e0b;
+  animation: pulse-warning 2s infinite;
+}
+
+.delivery-info-section .status-field.status-delayed:hover {
+  background: linear-gradient(135deg, #d97706, #f59e0b);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(245, 158, 11, 0.4);
+  animation: none;
+}
+
+/* 경고 애니메이션 */
+@keyframes pulse-warning {
+  0%, 100% {
+    box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+  }
+  50% {
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.6);
+  }
+}
+
+/* 수정 컨테이너 스타일 */
+.delivery-info-section .edit-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+/* 입력 필드와 삭제 버튼을 포함하는 컨테이너 */
+.delivery-info-section .input-with-clear {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* 입력 필드와 단위 텍스트를 포함하는 컨테이너 */
+.delivery-info-section .input-with-unit {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* 단위 텍스트 스타일 */
+.delivery-info-section .unit-text {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  pointer-events: none;
+  z-index: 5;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* 삭제 버튼 스타일 */
+.delivery-info-section .clear-date-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.delivery-info-section .clear-date-btn:hover {
+  background: rgba(239, 68, 68, 1);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+}
+
+/* 입력 필드 스타일 */
+.delivery-info-section .info-input {
+  background: linear-gradient(135deg, #ff8c00, #ff6b35);
+  border: 1px solid #ff8c00;
+  border-radius: 6px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0.5rem 2rem 0.5rem 0.5rem; /* 우측에 x 버튼 공간 확보 */
+  width: 120px;
+  outline: none;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(255, 140, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.delivery-info-section .info-input:hover {
+  background: linear-gradient(135deg, #ff6b35, #ff8c00);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(255, 140, 0, 0.4);
+}
+
+.delivery-info-section .info-input:focus {
+  background: linear-gradient(135deg, #ff6b35, #ff8c00);
+  border-color: #ff6b35;
+  box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.3);
+}
+
+.delivery-info-section .info-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.delivery-info-section .info-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+
+/* select 요소 전용 스타일 */
+.delivery-info-section .info-input[type="date"],
+.delivery-info-section .info-input select {
+  cursor: pointer;
+}
+
+.delivery-info-section .info-input select option {
+  background: #1f2937;
+  color: white;
+  padding: 0.5rem;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .delivery-info-section .info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .delivery-info-section .info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .delivery-info-section .info-label {
+    min-width: auto;
+  }
+  
+  .delivery-info-section .editable-field {
+    width: 100%;
+    text-align: left;
+  }
+} 

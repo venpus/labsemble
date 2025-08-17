@@ -22,10 +22,36 @@ const PORT = process.env.PORT || 5001;
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 })); // 보안 헤더 설정
-app.use(cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
-  credentials: true
-})); // CORS 설정
+// CORS 설정 - 외부 접속을 위한 유연한 설정
+const corsOptions = {
+  origin: function (origin, callback) {
+    // origin이 없는 경우 (모바일 앱, Postman 등) 허용
+    if (!origin) return callback(null, true);
+    
+    // 개발 환경에서는 모든 origin 허용
+    if (process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+    
+    // 프로덕션 환경에서는 허용된 origin만
+    const allowedOrigins = [
+      process.env.FRONTEND_URL,
+      ...(process.env.ALLOWED_ORIGINS?.split(',') || [])
+    ].filter(Boolean);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS 정책에 의해 차단되었습니다.'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions)); // CORS 설정
 app.use(morgan('combined')); // 로깅
 app.use(express.json()); // JSON 파싱
 app.use(express.urlencoded({ extended: true }));
@@ -73,24 +99,40 @@ app.use('/api/work-statuses', workStatusesRouter);
 // 데이터베이스 연결 테스트 엔드포인트
 app.get('/api/db-test', async (req, res) => {
   try {
+    console.log('데이터베이스 연결 테스트 요청 받음:', {
+      ip: req.ip,
+      userAgent: req.get('User-Agent'),
+      timestamp: new Date().toISOString()
+    });
+    
     const isConnected = await testConnection();
     if (isConnected) {
+      console.log('데이터베이스 연결 성공');
       res.json({
         success: true,
         message: '데이터베이스 연결 성공',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        serverInfo: {
+          nodeVersion: process.version,
+          platform: process.platform,
+          uptime: process.uptime()
+        }
       });
     } else {
+      console.log('데이터베이스 연결 실패');
       res.status(500).json({
         success: false,
-        message: '데이터베이스 연결 실패'
+        message: '데이터베이스 연결 실패',
+        timestamp: new Date().toISOString()
       });
     }
   } catch (error) {
+    console.error('데이터베이스 연결 테스트 오류:', error);
     res.status(500).json({
       success: false,
       message: '데이터베이스 연결 테스트 중 오류 발생',
-      error: error.message
+      error: error.message,
+      timestamp: new Date().toISOString()
     });
   }
 });
@@ -113,8 +155,10 @@ app.use((err, req, res, next) => {
 });
 
 // 서버 시작
-app.listen(PORT, async () => {
+app.listen(PORT, '0.0.0.0', async () => {
   console.log(`🚀 Labsemble 서버가 포트 ${PORT}에서 실행 중입니다.`);
+  console.log(`🌐 외부 접속 가능: http://0.0.0.0:${PORT}`);
+  console.log(`🔗 로컬 접속: http://localhost:${PORT}`);
   
   // 데이터베이스 연결 테스트 및 초기화
   try {

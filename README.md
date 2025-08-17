@@ -89,7 +89,7 @@ npm start
 
 ```env
 # 서버 설정
-PORT=5000
+PORT=5001
 NODE_ENV=development
 
 # 데이터베이스 설정 (MariaDB)
@@ -97,17 +97,45 @@ DB_HOST=localhost
 DB_PORT=3306
 DB_NAME=labsemble
 DB_USER=root
-DB_PASSWORD=
+DB_PASSWORD=your_password
 
 # JWT 설정
 JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
 JWT_EXPIRES_IN=24h
 
-# CORS 설정
-CORS_ORIGIN=http://localhost:3000
+# 프론트엔드 URL (프로덕션 환경용)
+FRONTEND_URL=http://your-domain.com
+
+# 허용된 Origin 목록 (프로덕션 환경용)
+ALLOWED_ORIGINS=http://your-domain.com,https://your-domain.com
 
 # 로깅 설정
 LOG_LEVEL=combined
+```
+
+## 🌐 외부 접속 설정
+
+### 서버 설정
+- 서버는 `0.0.0.0:5001`에서 실행되어 모든 IP에서 접속 가능
+- CORS 설정으로 개발 환경에서는 모든 origin 허용
+- 프로덕션 환경에서는 지정된 도메인만 허용
+
+### 클라이언트 설정
+- `.env` 파일에서 `REACT_APP_API_URL`을 서버 IP로 설정
+- 서버 IP 확인: `ipconfig` (Windows) 또는 `ifconfig` (Mac/Linux)
+- 방화벽에서 5001 포트 열기
+
+### 환경변수 설정 예시
+클라이언트 디렉토리에 `.env` 파일을 생성하고 다음 내용을 추가하세요:
+
+```env
+# API 서버 URL
+REACT_APP_API_URL=http://your-server-ip:5001
+
+# 예시:
+# 로컬 네트워크: REACT_APP_API_URL=http://192.168.1.100:5001
+# 외부 도메인: REACT_APP_API_URL=http://your-domain.com:5001
+# 개발 환경: REACT_APP_API_URL=http://localhost:5001
 ```
 
 ## 🎨 UI 특징

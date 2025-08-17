@@ -4,7 +4,7 @@
   border-radius: 12px;
   padding: 1.5rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: 2rem;
+  margin-bottom: 0.1rem;
 }
 
 .project-info-section h3 {
@@ -32,20 +32,62 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.3s ease;
+  min-height: 60px;
 }
 
 .project-info-section .info-item.full-width {
   grid-column: 1 / -1;
 }
 
+.project-info-section .info-item.full-width.has-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+.project-info-section .info-item.full-width.has-input:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
 .project-info-section .info-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(59, 130, 246, 0.3);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(59, 130, 246, 0.4);
   transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* 입력 필드가 있는 info-item에 대한 특별한 스타일 */
+.project-info-section .info-item.has-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.project-info-section .info-item.has-input:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.project-info-section .info-item.has-input .info-label {
+  flex-shrink: 0;
+  min-width: 80px;
+}
+
+.project-info-section .info-item.has-input .info-value {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .project-info-section .info-label {
@@ -72,6 +114,8 @@
   display: inline-block;
   min-width: 80px;
   text-align: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .project-info-section .editable-field:hover {
@@ -84,8 +128,9 @@
 .project-info-section .edit-container {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
   width: 100%;
+  align-items: center;
 }
 
 .project-info-section .display-container {
@@ -97,25 +142,37 @@
 
 /* 입력 필드 스타일 */
 .project-info-section .info-input {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
   color: white;
   font-size: 1rem;
-  font-weight: 700;
-  padding: 0.5rem;
-  width: 120px;
+  font-weight: 600;
+  padding: 0.6rem 0.8rem;
+  width: 100%;
+  max-width: 120px;
   outline: none;
   text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
 }
 
 .project-info-section .info-input:focus {
   border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3), 0 4px 12px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.project-info-section .info-input:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 .project-info-section .info-input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.6);
   font-weight: 500;
 }
 
@@ -237,6 +294,37 @@
   flex-wrap: wrap;
 }
 
+.project-info-section .link-with-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.project-info-section .copy-link-btn {
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: #60a5fa;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+}
+
+.project-info-section .copy-link-btn:hover {
+  background: rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.6);
+  color: #93c5fd;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
 .project-info-section .edit-link-btn {
   padding: 0.5rem 1rem;
   background: #3b82f6;
@@ -259,6 +347,7 @@
   flex-direction: column;
   gap: 0.75rem;
   width: 100%;
+  align-items: stretch;
 }
 
 .project-info-section .link-edit-input {
@@ -269,6 +358,7 @@
   color: white;
   font-size: 0.9rem;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .project-info-section .link-edit-input:focus {

@@ -1,3 +1,33 @@
+# Labsemble Client
+
+Labsemble MJ 프로젝트 관리 시스템의 프론트엔드 클라이언트입니다.
+
+## 외부 서버 접속 설정
+
+### 1. 환경변수 설정
+프로젝트 루트에 `.env` 파일을 생성하고 다음 내용을 추가하세요:
+
+```env
+# API 서버 URL
+REACT_APP_API_URL=http://your-server-ip:5001
+
+# 예시:
+# 로컬 네트워크: REACT_APP_API_URL=http://192.168.1.100:5001
+# 외부 도메인: REACT_APP_API_URL=http://your-domain.com:5001
+# 개발 환경: REACT_APP_API_URL=http://localhost:5001
+```
+
+### 2. 서버 IP 확인 방법
+- **Windows**: `ipconfig` 명령어로 IP 주소 확인
+- **Mac/Linux**: `ifconfig` 또는 `ip addr` 명령어로 IP 주소 확인
+- **공유기**: 공유기 관리 페이지에서 서버 IP 확인
+
+### 3. 방화벽 설정
+- 서버의 5001 포트를 방화벽에서 열어주세요
+- Windows Defender 방화벽에서 인바운드 규칙 추가
+
+---
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

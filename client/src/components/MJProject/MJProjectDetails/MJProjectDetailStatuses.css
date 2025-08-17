@@ -4,7 +4,7 @@
   border-radius: 12px;
   padding: 1.5rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: 2rem;
+  margin-bottom: 0.1rem;
 }
 
 .statuses-section h3 {
@@ -76,6 +76,71 @@
   box-shadow: 0 4px 8px rgba(255, 140, 0, 0.4);
 }
 
+/* 값이 변할 수 있는 영역 스타일 (초록색 배경) */
+.statuses-section .status-field {
+  background: linear-gradient(135deg, #10b981, #059669);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+  border: 1px solid #10b981;
+  transition: all 0.3s ease;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+  color: white;
+}
+
+.statuses-section .status-field:hover {
+  background: linear-gradient(135deg, #059669, #10b981);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4);
+}
+
+/* 수정 컨테이너 스타일 */
+.statuses-section .edit-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+/* 입력 필드 스타일 */
+.statuses-section .info-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0.5rem;
+  width: 120px;
+  outline: none;
+  text-align: center;
+}
+
+.statuses-section .info-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.statuses-section .info-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+
+/* select 요소 전용 스타일 */
+.statuses-section .info-input[type="date"],
+.statuses-section .info-input select {
+  cursor: pointer;
+}
+
+.statuses-section .info-input select option {
+  background: #1f2937;
+  color: white;
+  padding: 0.5rem;
+}
+
 /* 반응형 디자인 */
 @media (max-width: 768px) {
   .statuses-section .info-grid {
@@ -92,7 +157,8 @@
     min-width: auto;
   }
   
-  .statuses-section .editable-field {
+  .statuses-section .editable-field,
+  .statuses-section .status-field {
     width: 100%;
     text-align: left;
   }

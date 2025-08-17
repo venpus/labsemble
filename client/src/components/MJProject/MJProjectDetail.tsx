@@ -3,6 +3,8 @@ import './MJProjectDetail.css';
 import MJProjectDetailHeader from './MJProjectDetails/MJProjectDetailHeader';
 import MJProjectDetailProjInfo from './MJProjectDetails/MJProjectDetailProjInfo';
 import MJProjectDetailStatuses from './MJProjectDetails/MJProjectDetailStatuses';
+import MJProjectProdInfo from './MJProjectDetails/MJProjectProdInfo';
+import MJProjectDetailDeliveryInfo from './MJProjectDetails/MJProjectDetailDeliveryInfo';
 import MJProjectDetailPaymentsStatuses from './MJProjectDetails/MJProjectDetailPaymentsStatuses';
 
 interface MJProject {
@@ -33,6 +35,7 @@ interface MJProjectDetailProps {
   onClose: () => void;
   onEdit?: (project: MJProject) => void;
   onDelete?: (projectId: number) => void;
+  onProjectUpdate?: () => void; // 프로젝트 정보 업데이트 콜백
   currentUser?: {
     id: number;
     username: string;
@@ -41,7 +44,7 @@ interface MJProjectDetailProps {
   };
 }
 
-const MJProjectDetail: React.FC<MJProjectDetailProps> = ({ project, onClose, onEdit, onDelete, currentUser }) => {
+const MJProjectDetail: React.FC<MJProjectDetailProps> = ({ project, onClose, onEdit, onDelete, onProjectUpdate, currentUser }) => {
   const [editingPurchaseLink, setEditingPurchaseLink] = useState(false);
   const [purchaseLinkEdit, setPurchaseLinkEdit] = useState(project.purchase_link || '');
   const [savingLink, setSavingLink] = useState(false);
@@ -94,7 +97,21 @@ const MJProjectDetail: React.FC<MJProjectDetailProps> = ({ project, onClose, onE
       <div className="detail-content">
         <MJProjectDetailProjInfo project={project} currentUser={currentUser} />
 
-        <MJProjectDetailStatuses project={project} currentUser={currentUser} />
+        <MJProjectDetailStatuses 
+          project={project} 
+          currentUser={currentUser} 
+        />
+
+        <MJProjectProdInfo 
+          project={project} 
+          currentUser={currentUser} 
+        />
+
+        <MJProjectDetailDeliveryInfo 
+          project={project} 
+          currentUser={currentUser} 
+          onProjectUpdate={onProjectUpdate}
+        />
 
         <MJProjectDetailPaymentsStatuses project={project} currentUser={currentUser} />
 

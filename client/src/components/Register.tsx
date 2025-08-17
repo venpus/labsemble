@@ -56,7 +56,23 @@ const Register: React.FC<RegisterProps> = ({ onRegisterSuccess, onSwitchToLogin 
         setError(response.data.error || '회원가입에 실패했습니다.');
       }
     } catch (err: any) {
-      setError(err.response?.data?.error || '회원가입 중 오류가 발생했습니다.');
+      console.error('회원가입 오류 상세:', err);
+      
+      let errorMessage = '회원가입 중 오류가 발생했습니다.';
+      
+      if (err.response?.data?.error) {
+        errorMessage = err.response.data.error;
+      } else if (err.response?.data?.details) {
+        errorMessage = `${err.response.data.error || '오류'}: ${err.response.data.details}`;
+      } else if (err.message) {
+        errorMessage = err.message;
+      } else if (err.code === 'ERR_NETWORK') {
+        errorMessage = '네트워크 연결 오류. 서버에 연결할 수 없습니다.';
+      } else if (err.code === 'ECONNREFUSED') {
+        errorMessage = '서버 연결 거부. 서버가 실행 중인지 확인해주세요.';
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

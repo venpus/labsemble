@@ -62,9 +62,17 @@ router.get('/:id', async (req, res) => {
 
 // 새 사용자 생성
 router.post('/', async (req, res) => {
+  console.log('회원가입 요청 받음:', {
+    body: req.body,
+    headers: req.headers,
+    ip: req.ip,
+    userAgent: req.get('User-Agent')
+  });
+  
   const { username, email, password, companyName, contactPerson, phoneNumber } = req.body;
   
   if (!username || !email || !password) {
+    console.log('필수 필드 누락:', { username: !!username, email: !!email, password: !!password });
     return res.status(400).json({
       success: false,
       error: '사용자명, 이메일, 비밀번호는 필수입니다.'
@@ -72,13 +80,25 @@ router.post('/', async (req, res) => {
   }
   
   try {
+    console.log('데이터베이스 연결 시도...');
     // 비밀번호 해시화 (실제 프로젝트에서는 bcrypt 사용 권장)
     const passwordHash = Buffer.from(password).toString('base64');
+    
+    console.log('SQL 실행:', {
+      username,
+      email,
+      passwordHash: passwordHash.substring(0, 10) + '...',
+      companyName,
+      contactPerson,
+      phoneNumber
+    });
     
     const [result] = await pool.execute(
       'INSERT INTO users (username, email, password_hash, company_name, contact_person, phone_number) VALUES (?, ?, ?, ?, ?, ?)',
       [username, email, passwordHash, companyName || null, contactPerson || null, phoneNumber || null]
     );
+    
+    console.log('사용자 생성 성공:', { userId: result.insertId });
     
     res.status(201).json({
       success: true,
@@ -86,7 +106,14 @@ router.post('/', async (req, res) => {
       userId: result.insertId
     });
   } catch (error) {
-    console.error('사용자 생성 오류:', error);
+    console.error('사용자 생성 오류 상세:', {
+      message: error.message,
+      code: error.code,
+      errno: error.errno,
+      sqlState: error.sqlState,
+      sqlMessage: error.sqlMessage,
+      stack: error.stack
+    });
     
     if (error.code === 'ER_DUP_ENTRY') {
       return res.status(409).json({
@@ -97,7 +124,8 @@ router.post('/', async (req, res) => {
     
     res.status(500).json({
       success: false,
-      error: '사용자 생성에 실패했습니다.'
+      error: '사용자 생성에 실패했습니다.',
+      details: process.env.NODE_ENV === 'development' ? error.message : '내부 서버 오류'
     });
   }
 });

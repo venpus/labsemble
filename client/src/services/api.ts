@@ -138,6 +138,28 @@ export const apiService = {
   getMJPaymentStatuses: () => api.get('/api/work-statuses/mj?status_type=payment'),
   getMJDeliveryStatuses: () => api.get('/api/work-statuses/mj?status_type=delivery'),
   
+  // MJ 프로젝트 수정 API
+  updateMJProjectQuantity: (id: number, quantity: number) => 
+    api.patch(`/api/mj-projects/${id}/quantity`, { quantity }),
+  updateMJProjectPrice: (id: number, price: number) => 
+    api.patch(`/api/mj-projects/${id}/price`, { price }),
+  updateMJProjectPurchaseLink: (id: number, purchaseLink: string) => 
+    api.patch(`/api/mj-projects/${id}/purchase-link`, { purchaseLink }),
+  updateMJProjectExpectedShippingDate: (id: number, expected_shipping_date: string | null) => 
+    api.patch(`/api/mj-projects/${id}/expected-shipping-date`, { expected_shipping_date }),
+  updateMJProjectProductionDays: (id: number, production_days: number | null) => 
+    api.patch(`/api/mj-projects/${id}/production-days`, { production_days }),
+  updateMJProjectLogisticCost: (id: number, logistic_cost: number | null) => 
+    api.patch(`/api/mj-projects/${id}/logistic-cost`, { logistic_cost }),
+  updateMJProjectCommissionRate: (id: number, commission_rate: number) => 
+    api.patch(`/api/mj-projects/${id}/commission-rate`, { commission_rate }),
+  updateMJProjectCommission: (id: number, commission: number) => 
+    api.patch(`/api/mj-projects/${id}/commission`, { commission }),
+  updateMJProjectTotalPayment: (id: number, total_payment: number) => 
+    api.patch(`/api/mj-projects/${id}/total-payment`, { total_payment }),
+  updateMJProjectDeliveryStatus: (id: number, delivery_status: string) => 
+    api.patch(`/api/mj-projects/${id}/delivery-status`, { delivery_status }),
+  
   // 기본 서버 정보
   getServerInfo: () => api.get('/'),
 };

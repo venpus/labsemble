@@ -4,7 +4,7 @@
   border-radius: 12px;
   padding: 1.5rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: 2rem;
+  margin-bottom: 0.1rem;
 }
 
 .payments-statuses-section h3 {
@@ -94,6 +94,36 @@
   font-weight: 500;
   opacity: 0.8;
   color: #d1fae5;
+}
+
+/* 총 결제 금액 특별 스타일 */
+.payments-statuses-section .total-payment .info-value {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 900;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  border: 2px solid #3b82f6;
+  color: white;
+  text-align: center;
+  min-width: 200px;
+  transition: all 0.3s ease;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.payments-statuses-section .total-payment .info-value:hover {
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+  border-color: #60a5fa;
+}
+
+.payments-statuses-section .total-payment .calculation-note {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #bfdbfe;
+  margin-top: 0.5rem;
 }
 
 /* 입력 필드 스타일 */
@@ -228,4 +258,59 @@
   .payments-statuses-section h3 {
     font-size: 1.25rem;
   }
+}
+
+/* 수수료율 드롭다운 전용 스타일 */
+.payments-statuses-section .payment-select {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  border: 2px solid #8b5cf6;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+  min-width: 120px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  background-size: 1em;
+  padding-right: 2.5rem;
+}
+
+.payments-statuses-section .payment-select:hover {
+  background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+  border-color: #a78bfa;
+}
+
+.payments-statuses-section .payment-select:focus {
+  outline: none;
+  border-color: #a78bfa;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+}
+
+.payments-statuses-section .payment-select option {
+  background: #1f2937;
+  color: white;
+  font-weight: 500;
+  padding: 0.5rem;
+}
+
+.payments-statuses-section .payment-select option:hover {
+  background: #374151;
+}
+
+.payments-statuses-section .payment-select option:checked {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  font-weight: 600;
 } 

@@ -105,6 +105,7 @@ const MJProjectDetail: React.FC<MJProjectDetailProps> = ({ project, onClose, onE
         <MJProjectProdInfo 
           project={project} 
           currentUser={currentUser} 
+          onProjectUpdate={onProjectUpdate}
         />
 
         <MJProjectDetailDeliveryInfo 

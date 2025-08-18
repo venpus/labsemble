@@ -64,6 +64,12 @@ const MJProjectManagement: React.FC<MJProjectManagementProps> = ({ users, curren
         const data = await response.json();
         const projects = data.projects || [];
         
+        // 이미지 경로 디버깅 로그
+        console.log('클라이언트 - 프로젝트 목록 수신, image_paths 확인:');
+        projects.forEach((project: MJProject, index: number) => {
+          console.log(`  프로젝트 ${index + 1} (ID: ${project.id}): image_paths =`, project.image_paths);
+        });
+        
         // 사용자 정보와 함께 프로젝트 정보 로드
         const projectsWithUserInfo = projects.map((project: MJProject) => {
           const user = users.find(u => u.id === project.user_id);
@@ -143,6 +149,7 @@ const MJProjectManagement: React.FC<MJProjectManagementProps> = ({ users, curren
         isAdmin={users.some(user => user.is_admin)}
         showDetail={showDetail}
         setShowDetail={setShowDetail}
+        onRefreshProjects={loadMJProjects}
         currentUser={currentUser}
       />
     </div>

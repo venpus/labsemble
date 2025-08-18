@@ -160,6 +160,20 @@ export const apiService = {
   updateMJProjectDeliveryStatus: (id: number, delivery_status: string) => 
     api.patch(`/api/mj-projects/${id}/delivery-status`, { delivery_status }),
   
+    // MJ 프로젝트 이미지 관리 API
+  uploadProjectImages: (projectId: number, formData: FormData) =>
+    api.post(`/api/mj-projects/${projectId}/images`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }),
+  deleteProjectImage: (projectId: number, imagePath: string) =>
+    api.delete(`/api/mj-projects/${projectId}/images`, {
+      data: { imagePath }
+    }),
+  getProjectImages: (projectId: number) =>
+    api.get(`/api/mj-projects/${projectId}/prod-images`),
+  
   // 기본 서버 정보
   getServerInfo: () => api.get('/'),
 };

@@ -29,6 +29,7 @@ interface MJProjectListsProps {
   isAdmin?: boolean;
   showDetail?: boolean;
   setShowDetail?: (show: boolean) => void;
+  onRefreshProjects?: () => void; // 프로젝트 목록 새로고침 콜백
   currentUser?: {
     id: number;
     username: string;
@@ -39,7 +40,7 @@ interface MJProjectListsProps {
 
 
 
-const MJProjectLists: React.FC<MJProjectListsProps> = ({ mjProjects, isAdmin = false, showDetail: externalShowDetail, setShowDetail: externalSetShowDetail, currentUser }) => {
+const MJProjectLists: React.FC<MJProjectListsProps> = ({ mjProjects, isAdmin = false, showDetail: externalShowDetail, setShowDetail: externalSetShowDetail, onRefreshProjects, currentUser }) => {
   const [appliedFilters, setAppliedFilters] = useState<SearchFilters>({
     user: '',
     company: '',
@@ -228,8 +229,10 @@ const MJProjectLists: React.FC<MJProjectListsProps> = ({ mjProjects, isAdmin = f
               onDelete={handleDeleteProject}
               onProjectUpdate={() => {
                 // 프로젝트 정보를 새로고침
-                // 현재는 간단하게 처리하지만, 향후 API 호출로 개선 가능
                 console.log('프로젝트 정보 업데이트 요청됨');
+                if (onRefreshProjects) {
+                  onRefreshProjects();
+                }
               }}
               currentUser={currentUser}
             />

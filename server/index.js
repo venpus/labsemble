@@ -3,6 +3,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
 
 // 데이터베이스 설정
@@ -63,6 +65,22 @@ app.use('/uploads', (req, res, next) => {
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   next();
 }, express.static('uploads'));
+
+// ProRealImage 디렉토리 별도 서빙 (필요시)
+app.use('/uploads/ProRealImage', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+}, express.static('uploads/ProRealImage'));
+
+// 프로젝트 코드별 폴더 서빙 (동적 경로)
+app.use('/uploads/ProRealImage/:projectCode', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+}, express.static('uploads/ProRealImage'));
 
 // Rate limiting 설정
 const limiter = rateLimit({
@@ -159,6 +177,24 @@ app.listen(PORT, '0.0.0.0', async () => {
   console.log(`🚀 Labsemble 서버가 포트 ${PORT}에서 실행 중입니다.`);
   console.log(`🌐 외부 접속 가능: http://0.0.0.0:${PORT}`);
   console.log(`🔗 로컬 접속: http://localhost:${PORT}`);
+  
+  // 업로드 디렉토리 생성
+  try {
+    const uploadsDir = path.join(__dirname, 'uploads');
+    const proRealImageDir = path.join(uploadsDir, 'ProRealImage');
+    
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+      console.log('✅ uploads 디렉토리 생성됨');
+    }
+    
+    if (!fs.existsSync(proRealImageDir)) {
+      fs.mkdirSync(proRealImageDir, { recursive: true });
+      console.log('✅ uploads/ProRealImage 디렉토리 생성됨');
+    }
+  } catch (error) {
+    console.error('❌ 업로드 디렉토리 생성 실패:', error.message);
+  }
   
   // 데이터베이스 연결 테스트 및 초기화
   try {

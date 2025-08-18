@@ -44,14 +44,16 @@
   transform: translateY(-2px);
 }
 
-.prod-info-section .info-label {
+.prod-info-section .info-label,
+.prod-info-section .label {
   font-weight: 600;
   color: rgba(255, 255, 255, 0.8);
   min-width: 100px;
   flex-shrink: 0;
 }
 
-.prod-info-section .info-value {
+.prod-info-section .info-value,
+.prod-info-section .value {
   color: white;
   flex: 1;
 }
@@ -75,6 +77,21 @@
 
 .prod-info-section .reference-link:hover {
   color: #60a5fa;
+  text-decoration: underline;
+}
+
+.prod-info-section .purchase-link {
+  color: #10b981;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.prod-info-section .purchase-link:hover {
+  color: #34d399;
   text-decoration: underline;
 }
 

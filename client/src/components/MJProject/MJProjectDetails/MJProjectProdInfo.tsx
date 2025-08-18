@@ -1,4 +1,5 @@
 import React from 'react';
+import { ProdRealImage } from './ProdInfo';
 import './MJProjectProdInfo.css';
 
 interface MJProject {
@@ -32,36 +33,42 @@ interface MJProjectProdInfoProps {
     email: string;
     is_admin?: boolean;
   };
+  onProjectUpdate?: () => void; // 프로젝트 데이터 새로고침을 위한 콜백
 }
 
-const MJProjectProdInfo: React.FC<MJProjectProdInfoProps> = ({ project, currentUser }) => {
+const MJProjectProdInfo: React.FC<MJProjectProdInfoProps> = ({ project, currentUser, onProjectUpdate }) => {
+  const isEditable = currentUser?.is_admin || currentUser?.id === project.user_id;
+
+  // 디버깅을 위한 로그
+  console.log('MJProjectProdInfo project data:', {
+    id: project.id,
+    image_paths: project.image_paths,
+    image_paths_type: typeof project.image_paths,
+    isArray: Array.isArray(project.image_paths)
+  });
+
+  const handleImagesUpdate = (newImages: string[]) => {
+    // 이미지 업데이트 시 부모 컴포넌트에 알림
+    console.log('이미지가 업데이트되었습니다:', newImages);
+    
+    // 부모 컴포넌트에 프로젝트 데이터 새로고침 요청
+    if (onProjectUpdate) {
+      onProjectUpdate();
+    }
+  };
 
   return (
     <div className="detail-section prod-info-section">
       <h3>🛍️ 상품 정보</h3>
-      <div className="info-grid">
-        {project.reference_link && (
-          <div className="info-item">
-            <span className="info-label">참고 링크:</span>
-            <span className="info-value">
-              <div className="link-display">
-                <a
-                  href={project.reference_link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="reference-link clickable-link"
-                  title="클릭하여 새 탭에서 참고 링크 열기"
-                >
-                  {project.reference_link}
-                  <span className="link-icon">🔗</span>
-                </a>
-              </div>
-            </span>
-          </div>
-        )}
-      </div>
-
-
+      
+      {/* 상품 사진 업로드 컴포넌트 */}
+      <ProdRealImage
+        projectId={project.id}
+        projectCode={project.project_code}
+        currentImages={Array.isArray(project.image_paths) ? project.image_paths : []}
+        onImagesUpdate={handleImagesUpdate}
+        isEditable={isEditable}
+      />
     </div>
   );
 };

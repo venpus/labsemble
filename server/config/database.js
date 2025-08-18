@@ -170,6 +170,25 @@ async function initializeDatabase() {
      `);
      console.log('✅ mj_projects 테이블 생성됨');
 
+     // MJ 프로젝트 이미지 테이블 생성 (ProdRealImage용)
+     await connection.execute(`
+       CREATE TABLE IF NOT EXISTS mj_project_images (
+         id INT AUTO_INCREMENT PRIMARY KEY,
+         project_id INT NOT NULL,
+         filename VARCHAR(255) NOT NULL,
+         file_path VARCHAR(500) NOT NULL,
+         file_url VARCHAR(500) NOT NULL,
+         file_type ENUM('image', 'video') NOT NULL,
+         file_size BIGINT,
+         upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+         is_active BOOLEAN DEFAULT TRUE,
+         FOREIGN KEY (project_id) REFERENCES mj_projects(id) ON DELETE CASCADE,
+         INDEX idx_project_id (project_id),
+         INDEX idx_filename (filename)
+       )
+     `);
+     console.log('✅ mj_project_images 테이블 생성됨');
+
      // 기존 테이블에 출고 예정일 컬럼 추가 (이미 존재하는 경우 무시)
      try {
        await connection.execute('ALTER TABLE mj_projects ADD COLUMN expected_shipping_date DATE');

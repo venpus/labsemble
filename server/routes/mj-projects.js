@@ -4,29 +4,28 @@ const { authenticateToken } = require('../middleware/auth');
 const { pool } = require('../config/database');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
-// 이미지 업로드 설정
+// 미디어 업로드 설정 (동적 폴더 생성)
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/mj-projects/');
+    // 기본 폴더 (임시)
+    cb(null, 'uploads/ProRealImage/');
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'mj-project-' + uniqueSuffix + path.extname(file.originalname));
+    cb(null, 'prod-real-image-' + uniqueSuffix + path.extname(file.originalname));
   }
 });
 
 const upload = multer({ 
   storage: storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB 제한
-  },
   fileFilter: function (req, file, cb) {
-    // 이미지 파일만 허용
-    if (file.mimetype.startsWith('image/')) {
+    // 이미지 및 비디오 파일 허용
+    if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) {
       cb(null, true);
     } else {
-      cb(new Error('이미지 파일만 업로드 가능합니다.'), false);
+      cb(new Error('이미지 또는 비디오 파일만 업로드 가능합니다.'), false);
     }
   }
 });
@@ -136,7 +135,10 @@ router.get('/', authenticateToken, async (req, res) => {
     `);
 
     // 이미지 경로 디버깅 로그
-    
+    console.log('서버 - 프로젝트 목록 조회, image_paths 확인:');
+    projects.forEach((project, index) => {
+      console.log(`  프로젝트 ${index + 1} (ID: ${project.id}): image_paths =`, project.image_paths);
+    });
 
     connection.release();
 
@@ -708,7 +710,7 @@ router.patch('/:id/total-payment', authenticateToken, async (req, res) => {
 // 미디어 파일 업로드를 위한 Multer 설정
 const mediaStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadPath = path.join(__dirname, '../uploads/mj-projects');
+    const uploadPath = path.join(__dirname, '../uploads/ProRealImage');
     cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
@@ -811,6 +813,243 @@ router.post('/:id/media', authenticateToken, mediaUpload.array('media', 10), asy
   }
 });
 
+// MJ 프로젝트 미디어 업로드 (프로젝트 소유자 또는 Admin)
+router.post('/:id/images', authenticateToken, upload.array('productImages', 10), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+    
+    const connection = await pool.getConnection();
+    
+    // 프로젝트 존재 여부 및 권한 확인 (프로젝트 코드 포함)
+    const [projectCheck] = await connection.execute(
+      'SELECT id, user_id, image_paths, project_code FROM mj_projects WHERE id = ?',
+      [id]
+    );
+
+    if (projectCheck.length === 0) {
+      connection.release();
+      return res.status(404).json({ error: '프로젝트를 찾을 수 없습니다.' });
+    }
+
+    const project = projectCheck[0];
+    
+    // 권한 확인: 프로젝트 소유자 또는 Admin만 수정 가능
+    if (project.user_id !== userId && !req.user.is_admin) {
+      connection.release();
+      return res.status(403).json({ error: '이미지 업로드 권한이 없습니다.' });
+    }
+
+    // 프로젝트 코드별 폴더 생성 및 파일 이동
+    const projectCode = project.project_code || `project-${id}`;
+    const projectFolder = `uploads/ProRealImage/${projectCode}`;
+    
+    // 폴더가 존재하지 않으면 생성
+    if (!fs.existsSync(projectFolder)) {
+      fs.mkdirSync(projectFolder, { recursive: true });
+      console.log(`✅ 프로젝트 폴더 생성됨: ${projectFolder}`);
+    }
+
+    // 기존 이미지 경로 가져오기
+    let existingPaths = [];
+    if (project.image_paths) {
+      try {
+        existingPaths = JSON.parse(project.image_paths);
+      } catch (e) {
+        existingPaths = [];
+      }
+    }
+    
+    console.log('서버 - 기존 이미지 경로:', existingPaths);
+
+    // 새로 업로드된 이미지 처리 및 프로젝트 폴더로 이동
+    let newImagePaths = [];
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const oldPath = file.path;
+        const newPath = path.join(projectFolder, file.filename);
+        
+        // 파일을 프로젝트 폴더로 이동
+        fs.renameSync(oldPath, newPath);
+        console.log(`✅ 파일 이동됨: ${oldPath} → ${newPath}`);
+        
+        // 파일 타입 확인
+        const isVideo = file.mimetype.startsWith('video/');
+        const fileType = isVideo ? 'video' : 'image';
+        
+        // DB에 이미지 정보 저장
+        const fileUrl = `http://localhost:5001/uploads/ProRealImage/${projectCode}/${file.filename}`;
+        await connection.execute(
+          'INSERT INTO mj_project_images (project_id, filename, file_path, file_url, file_type, file_size) VALUES (?, ?, ?, ?, ?, ?)',
+          [id, file.filename, newPath, fileUrl, fileType, file.size]
+        );
+        console.log(`✅ 이미지 정보 DB 저장됨: ${file.filename}`);
+        
+        newImagePaths.push(file.filename);
+      }
+    }
+    
+    console.log('서버 - 새로 업로드된 이미지:', newImagePaths);
+
+    // 전체 이미지 경로 (기존 + 새로운)
+    const updatedPaths = [...existingPaths, ...newImagePaths];
+    console.log('서버 - 업데이트된 전체 경로:', updatedPaths);
+
+    // 최대 10개 제한 확인
+    if (updatedPaths.length > 10) {
+      connection.release();
+      return res.status(400).json({ error: '최대 10개까지 업로드할 수 있습니다.' });
+    }
+
+    // 데이터베이스 업데이트
+    await connection.execute(
+      'UPDATE mj_projects SET image_paths = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [JSON.stringify(updatedPaths), id]
+    );
+
+    connection.release();
+
+    res.json({
+      success: true,
+      message: '미디어가 성공적으로 업로드되었습니다.',
+      imagePaths: newImagePaths,
+      totalImages: updatedPaths.length
+    });
+  } catch (error) {
+    console.error('미디어 업로드 오류:', error);
+    
+    if (error.code === 'LIMIT_FILE_COUNT') {
+      return res.status(400).json({ error: '업로드할 수 있는 파일 수를 초과했습니다. 최대 10개까지 업로드 가능합니다.' });
+    }
+    
+    res.status(500).json({ error: '미디어 업로드에 실패했습니다.' });
+  }
+});
+
+// MJ 프로젝트 이미지 삭제 (프로젝트 소유자 또는 Admin)
+router.delete('/:id/images', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { imagePath } = req.body;
+    const userId = req.user.id;
+    
+    const connection = await pool.getConnection();
+    
+    // 프로젝트 존재 여부 및 권한 확인 (프로젝트 코드 포함)
+    const [projectCheck] = await connection.execute(
+      'SELECT id, user_id, image_paths, project_code FROM mj_projects WHERE id = ?',
+      [id]
+    );
+
+    if (projectCheck.length === 0) {
+      connection.release();
+      return res.status(404).json({ error: '프로젝트를 찾을 수 없습니다.' });
+    }
+
+    const project = projectCheck[0];
+    
+    // 권한 확인: 프로젝트 소유자 또는 Admin만 수정 가능
+    if (project.user_id !== userId && !req.user.is_admin) {
+      connection.release();
+      return res.status(403).json({ error: '이미지 삭제 권한이 없습니다.' });
+    }
+
+    // 기존 이미지 경로 가져오기
+    let existingPaths = [];
+    if (project.image_paths) {
+      try {
+        existingPaths = JSON.parse(project.image_paths);
+      } catch (e) {
+        existingPaths = [];
+      }
+    }
+
+    // 삭제할 이미지 경로 제거
+    const updatedPaths = existingPaths.filter(path => path !== imagePath);
+
+    // 데이터베이스 업데이트
+    await connection.execute(
+      'UPDATE mj_projects SET image_paths = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [JSON.stringify(updatedPaths), id]
+    );
+
+    // DB에서 이미지 정보 삭제
+    await connection.execute(
+      'DELETE FROM mj_project_images WHERE project_id = ? AND filename = ?',
+      [id, imagePath]
+    );
+    console.log(`✅ DB에서 이미지 정보 삭제됨: ${imagePath}`);
+
+    // 실제 파일 삭제 (프로젝트 폴더에서)
+    try {
+      const projectCode = projectCheck[0].project_code || `project-${id}`;
+      const filePath = path.join(__dirname, '../uploads/ProRealImage', projectCode, imagePath);
+      const fs = require('fs').promises;
+      await fs.unlink(filePath);
+      console.log(`✅ 파일 삭제됨: ${filePath}`);
+    } catch (fileError) {
+      console.error('파일 삭제 실패:', fileError);
+      // 파일 삭제 실패해도 데이터베이스는 업데이트됨
+    }
+
+    connection.release();
+
+    res.json({
+      success: true,
+      message: '이미지가 성공적으로 삭제되었습니다.',
+      totalImages: updatedPaths.length
+    });
+  } catch (error) {
+    console.error('이미지 삭제 오류:', error);
+    res.status(500).json({ error: '이미지 삭제에 실패했습니다.' });
+  }
+});
+
+// MJ 프로젝트 이미지 목록 조회 (ProdRealImage용)
+router.get('/:id/prod-images', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+    
+    const connection = await pool.getConnection();
+    
+    // 프로젝트 존재 여부 및 권한 확인
+    const [projectCheck] = await connection.execute(
+      'SELECT id, user_id FROM mj_projects WHERE id = ?',
+      [id]
+    );
+
+    if (projectCheck.length === 0) {
+      connection.release();
+      return res.status(404).json({ error: '프로젝트를 찾을 수 없습니다.' });
+    }
+
+    const project = projectCheck[0];
+    
+    // 권한 확인: 프로젝트 소유자 또는 Admin만 조회 가능
+    if (project.user_id !== userId && !req.user.is_admin) {
+      connection.release();
+      return res.status(403).json({ error: '이미지 조회 권한이 없습니다.' });
+    }
+
+    // 프로젝트별 이미지 목록 조회
+    const [images] = await connection.execute(
+      'SELECT id, filename, file_url, file_type, file_size, upload_date FROM mj_project_images WHERE project_id = ? AND is_active = TRUE ORDER BY upload_date DESC',
+      [id]
+    );
+
+    connection.release();
+
+    res.json({
+      success: true,
+      images: images
+    });
+  } catch (error) {
+    console.error('이미지 목록 조회 오류:', error);
+    res.status(500).json({ error: '이미지 목록 조회에 실패했습니다.' });
+  }
+});
+
 // MJ 프로젝트 미디어 삭제 (Admin 사용자만)
 router.delete('/:id/media', authenticateToken, async (req, res) => {
   try {
@@ -856,7 +1095,7 @@ router.delete('/:id/media', authenticateToken, async (req, res) => {
 
     // 실제 파일 삭제
     try {
-      const filePath = path.join(__dirname, '../uploads/mj-projects', mediaPath);
+      const filePath = path.join(__dirname, '../uploads/ProRealImage', mediaPath);
       await fs.unlink(filePath);
     } catch (fileError) {
       console.error('파일 삭제 실패:', fileError);
